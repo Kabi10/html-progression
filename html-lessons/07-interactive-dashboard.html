@@ -68,6 +68,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Better touch feedback */
+            touch-action: manipulation; /* Optimize touch behavior */
         }
 
         body {
@@ -75,9 +77,10 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.5;
-            overflow: hidden;
-            height: 100vh;
+            overflow-x: hidden; /* Changed from hidden to allow vertical scroll */
+            min-height: 100vh; /* Changed from height to min-height */
             perspective: var(--perspective);
+            -webkit-text-size-adjust: 100%; /* Prevent font scaling */
         }
 
         /* 3D Scene Container */
@@ -94,10 +97,31 @@
         /* Main Layout */
         .dashboard {
             display: grid;
-            grid-template-columns: auto 1fr;
-            height: 100vh;
+            grid-template-columns: 1fr; /* Mobile-first: single column */
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
             transform-style: preserve-3d;
             animation: float 10s infinite ease-in-out;
+            padding: 1rem; /* Add padding for mobile */
+        }
+
+        /* Add responsive breakpoints */
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: auto 1fr;
+                padding: 0;
+            }
+        }
+
+        /* Add touch-friendly interaction styles */
+        @media (hover: none) and (pointer: coarse) {
+            /* Increase touch targets */
+            button, 
+            a {
+                min-height: 44px;
+                min-width: 44px;
+                padding: 12px;
+            }
         }
 
         @keyframes float {
@@ -352,9 +376,124 @@
 
         .prediction-value.up { color: var(--success); }
         .prediction-value.down { color: var(--danger); }
+
+        /* Mobile Responsive Enhancements */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+
+            /* Mobile menu toggle */
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1001;
+                background: var(--primary);
+                color: white;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                border: none;
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .overlay.active {
+                display: block;
+            }
+        }
+
+        /* Small screens */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 0.75rem;
+            }
+
+            .chart-container {
+                height: 200px;
+            }
+
+            .data-table {
+                font-size: 0.875rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar {
+                padding-top: 0.5rem;
+            }
+
+            .nav-item {
+                padding: 0.5rem 1rem;
+            }
+
+            .chart-container {
+                height: 180px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Add mobile menu toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
     <!-- 3D Background Scene -->
     <div id="scene-container"></div>
 
@@ -774,6 +913,22 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
+        });
+
+        // Add sidebar toggle functionality
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.querySelector('.menu-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('active');
+                document.querySelector('.overlay').classList.remove('active');
+            }
         });
     </script>
 </body>

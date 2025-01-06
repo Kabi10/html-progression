@@ -32,11 +32,12 @@
             }
         }
 
-        /* Base Styles */
+        /* Base Styles with Mobile-First Approach */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: manipulation; /* Improve touch response */
         }
 
         body {
@@ -48,9 +49,11 @@
             display: grid;
             place-items: center;
             overflow-x: hidden;
+            padding: 1rem; /* Add padding for mobile */
+            font-size: 16px; /* Base font size for readability */
         }
 
-        /* Interactive Background */
+        /* Responsive Grid Layout */
         .bg-grid {
             position: fixed;
             top: 0;
@@ -60,7 +63,7 @@
             background-image: 
                 linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background-size: 20px 20px; /* Smaller grid for mobile */
             z-index: -1;
             transform: perspective(500px) rotateX(60deg);
             transform-origin: top;
@@ -72,7 +75,7 @@
             to { background-position: 0 40px; }
         }
 
-        /* Floating Elements */
+        /* Responsive Floating Elements */
         .floating-shapes {
             position: fixed;
             inset: 0;
@@ -83,7 +86,7 @@
         .shape {
             position: absolute;
             border-radius: 50%;
-            filter: blur(40px);
+            filter: blur(20px); /* Reduced blur for better mobile performance */
             opacity: 0.4;
             animation: float 20s infinite;
         }
@@ -103,6 +106,23 @@
             bottom: -150px;
             right: -150px;
             animation-delay: -7s;
+        }
+
+        /* Media Queries */
+        @media (min-width: 768px) {
+            .bg-grid {
+                background-size: 40px 40px;
+            }
+
+            .shape {
+                filter: blur(40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-shapes {
+                display: none; /* Hide complex animations on small devices */
+            }
         }
 
         /* Main Content */

@@ -22,6 +22,8 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         /* UI Overlay */
@@ -31,13 +33,22 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 1rem;
+            padding: 0.75rem;
             background: var(--bg-dark);
             color: var(--text-light);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.5rem;
             backdrop-filter: blur(10px);
+        }
+
+        @media (min-width: 768px) {
+            .ui-overlay {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+            }
         }
 
         .status {
@@ -66,20 +77,34 @@
         /* Controls */
         .controls {
             position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 1rem;
+            left: 0;
+            right: 0;
+            transform: none;
             z-index: 1000;
             display: flex;
-            gap: 1rem;
+            justify-content: center;
+            gap: 0.75rem;
             background: var(--bg-dark);
-            padding: 1rem;
-            border-radius: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
             backdrop-filter: blur(10px);
+            margin: 0 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .controls {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                bottom: 2rem;
+                gap: 1rem;
+                padding: 1rem;
+            }
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             border: none;
             border-radius: 0.5rem;
             background: var(--primary);
@@ -89,6 +114,8 @@
             align-items: center;
             gap: 0.5rem;
             transition: opacity 0.3s ease;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .btn:hover {
@@ -185,9 +212,126 @@
         .notification.show {
             opacity: 1;
         }
+
+        /* Mobile Responsive Enhancements */
+        @media (max-width: 768px) {
+            .ui-overlay {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .controls {
+                bottom: 1rem;
+                padding: 0.75rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 90%;
+                max-width: 400px;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+
+            .object-controls {
+                right: 0.5rem;
+                padding: 0.75rem;
+                transform: scale(0.9);
+                transform-origin: right center;
+            }
+
+            .notification {
+                bottom: 5rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                width: 90%;
+                max-width: 300px;
+                text-align: center;
+            }
+        }
+
+        /* Small screens */
+        @media (max-width: 480px) {
+            .ui-overlay {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .controls {
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+
+            .object-controls {
+                transform: scale(0.8);
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .object-controls {
+                top: 1rem;
+                right: 1rem;
+                transform: none;
+            }
+
+            .controls {
+                bottom: 0.5rem;
+            }
+
+            .notification {
+                bottom: 4rem;
+            }
+        }
+
+        /* Touch feedback */
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Loading indicator */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <!-- Add loading overlay -->
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <!-- UI Overlay -->
     <div class="ui-overlay">
         <div class="status">
@@ -414,6 +558,39 @@
             initRecording();
             showNotification('AR system initialized', 'info');
         };
+
+        // Add loading handler
+        window.addEventListener('load', () => {
+            document.querySelector('.loading-overlay').style.display = 'none';
+        });
+
+        // Add touch event handlers
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                btn.style.transform = 'scale(0.95)';
+            });
+
+            btn.addEventListener('touchend', () => {
+                btn.style.transform = 'none';
+            });
+        });
+
+        // Optimize performance for mobile
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // Reduce particle count for better performance
+            const particles = document.querySelector('[particle-system]');
+            if (particles) {
+                particles.setAttribute('particle-system', 'particleCount', '50');
+            }
+
+            // Adjust camera settings for mobile
+            const camera = document.querySelector('[camera]');
+            if (camera) {
+                camera.setAttribute('fov', '70');
+                camera.setAttribute('near', '0.1');
+            }
+        }
     </script>
 </body>
 </html>

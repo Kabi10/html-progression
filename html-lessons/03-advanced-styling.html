@@ -38,6 +38,9 @@
             --transition-fast: 150ms ease;
             --transition-normal: 300ms ease;
             --transition-slow: 500ms ease;
+            
+            --touch-target-size: 44px;
+            --touch-target-spacing: 8px;
         }
 
         /* Dark Mode Variables */
@@ -52,20 +55,22 @@
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.3);
         }
 
-        /* Modern CSS Reset */
+        /* Modern CSS Reset with touch improvements */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Modern Scroll Behavior */
+        /* Added touch-friendly scroll settings */
         html {
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Base Styles */
+        /* Enhanced Base Styles for mobile */
         body {
             font-family: 'Poppins', system-ui, sans-serif;
             background-color: var(--surface-1);
@@ -75,20 +80,35 @@
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: var(--spacing-md);
+            padding: var(--spacing-sm); /* Reduced padding for mobile */
+            font-size: 16px; /* Base font size for readability */
         }
 
-        /* Advanced Grid Layout */
+        /* Responsive Grid Layout */
         .container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--spacing-md);
-            max-width: 1200px;
+            grid-template-columns: 1fr; /* Single column by default */
+            gap: var(--spacing-sm);
             width: 100%;
-            padding: var(--spacing-md);
+            padding: var(--spacing-sm);
+            max-width: 100%;
         }
 
-        /* Card Component with Advanced Styling */
+        /* Media query for larger screens */
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--spacing-md);
+                padding: var(--spacing-md);
+                max-width: 1200px;
+            }
+            
+            body {
+                padding: var(--spacing-md);
+            }
+        }
+
+        /* Enhanced Card Component with touch-friendly styles */
         .card {
             background: var(--surface-2);
             padding: var(--spacing-md);
@@ -97,6 +117,8 @@
             transition: transform var(--transition-normal), box-shadow var(--transition-normal);
             position: relative;
             overflow: hidden;
+            min-height: var(--touch-target-size);
+            touch-action: manipulation;
         }
 
         .card::before {

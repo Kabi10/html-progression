@@ -17,6 +17,8 @@
             
             --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
             --ease-smooth: cubic-bezier(0.45, 0, 0.55, 1);
+            --spacing-base: clamp(1rem, 2vw, 2rem);
+            --touch-target: 44px;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -30,6 +32,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: manipulation;
         }
 
         body {
@@ -41,6 +44,7 @@
             place-items: center;
             transition: background-color 0.5s var(--ease-smooth);
             overflow-x: hidden;
+            padding: var(--spacing-base);
         }
 
         body.dark-mode {
@@ -49,22 +53,22 @@
         }
 
         .container {
-            width: 90%;
+            width: 100%;
             max-width: 1200px;
-            padding: 2rem;
+            padding: var(--spacing-base);
         }
 
         /* Hero Section with SVG Animation */
         .hero {
             position: relative;
             text-align: center;
-            padding: 4rem 0;
+            padding: calc(var(--spacing-base) * 2) 0;
         }
 
         .hero h1 {
             font-size: clamp(2rem, 5vw, 4rem);
-            line-height: 1.1;
-            margin-bottom: 1rem;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-base);
             opacity: 0;
             transform: translateY(20px);
             animation: slideUp 0.8s var(--ease-elastic) forwards;
@@ -73,8 +77,8 @@
         .hero p {
             font-size: clamp(1rem, 2vw, 1.25rem);
             opacity: 0.8;
-            max-width: 600px;
-            margin: 0 auto 2rem;
+            max-width: min(600px, 90vw);
+            margin: 0 auto var(--spacing-base);
             opacity: 0;
             transform: translateY(20px);
             animation: slideUp 0.8s var(--ease-elastic) 0.2s forwards;

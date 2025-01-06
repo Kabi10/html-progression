@@ -3,60 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 9: Advanced 3D Dashboard</title>
+    <title>Level 9: Advanced 3D Interactive Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
+        :root {
+            --primary: #4f46e5;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+            touch-action: manipulation;
+        }
+
+        body {
+            overflow: hidden;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         .overlay {
             position: fixed;
             padding: 15px;
             background: rgba(15, 23, 42, 0.9);
-            color: white;
             border-radius: 10px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
+            z-index: 100;
+            max-width: 100%;
+            margin: 10px;
         }
+
         #controls {
             top: 20px;
             left: 20px;
+            width: calc(100% - 40px);
+            max-width: 300px;
         }
+
         #stats {
             top: 20px;
             right: 20px;
-            width: 200px;
+            width: calc(100% - 40px);
+            max-width: 200px;
         }
+
         #charts {
             bottom: 20px;
             right: 20px;
-            width: 300px;
+            width: calc(100% - 40px);
+            max-width: 300px;
             height: 200px;
         }
+
+        .shape-controls {
+            position: fixed;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+        }
+
+        #performance {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 90%;
+        }
+
         .button-group {
             margin-top: 15px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            justify-content: center;
         }
+
         button {
-            padding: 8px 15px;
-            background: #4f46e5;
+            padding: 12px 20px;
+            background: var(--primary);
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 44px;
+            min-height: 44px;
         }
+
+        @media (max-width: 768px) {
+            .overlay {
+                font-size: 14px;
+            }
+            
+            .shape-controls {
+                left: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #controls, #stats, #charts {
+                position: static;
+                margin: 10px auto;
+                transform: none;
+            }
+        }
+
         button:hover {
             background: #4338ca;
             transform: translateY(-2px);
         }
+
         .stat {
             display: flex;
             justify-content: space-between;
@@ -65,27 +143,74 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
         }
-        #particleCount {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
+
+        input[type="range"] {
+            width: 100%;
+            margin: 0.5rem 0;
         }
-        .shape-controls {
-            position: fixed;
-            top: 50%;
-            left: 20px;
-            transform: translateY(-50%);
+
+        input[type="color"] {
+            width: 100%;
+            height: 30px;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
         }
-        #performance {
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .overlay {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            #controls {
+                max-width: 250px;
+            }
+
+            #stats {
+                width: 150px;
+            }
+
+            #charts {
+                width: 250px;
+                height: 150px;
+            }
+
+            .button-group {
+                gap: 5px;
+            }
+
+            button {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch area for mobile */
+        .touch-area {
             position: fixed;
-            top: 20px;
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%);
-            text-align: center;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .touch-area {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
+    <div id="scene-container"></div>
+    
     <div id="controls" class="overlay">
         <h3>Advanced Controls</h3>
         <p>🖱️ Right-click + drag to orbit</p>
@@ -94,7 +219,6 @@
         <p>🎯 Click object to select</p>
         <div class="button-group">
             <button onclick="changeColor()">Random Color</button>
-            <button onclick="addObject()">Add Object</button>
             <button onclick="toggleAnimation()">Toggle Animation</button>
             <button onclick="toggleParticles()">Toggle Particles</button>
             <button onclick="resetScene()">Reset Scene</button>
@@ -133,10 +257,19 @@
             <button onclick="addShape('torus')">Torus</button>
             <button onclick="addShape('pyramid')">Pyramid</button>
         </div>
+        <h3>Controls</h3>
+        <label>Size</label>
+        <input type="range" min="0.1" max="2" step="0.1" value="1" onchange="updateSize(this.value)">
+        <label>Color</label>
+        <input type="color" value="#4f46e5" onchange="updateColor(this.value)">
+        <label>Speed</label>
+        <input type="range" min="0" max="5" step="0.1" value="1" onchange="updateSpeed(this.value)">
     </div>
 
+    <div class="touch-area"></div>
+
     <script>
-        // Scene setup with advanced features
+        // Scene setup
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x0f172a, 0.1);
         
@@ -144,7 +277,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
+        document.getElementById('scene-container').appendChild(renderer.domElement);
 
         // Enhanced lighting
         const ambientLight = new THREE.AmbientLight(0x404040);
@@ -163,7 +296,7 @@
         const gridHelper = new THREE.GridHelper(20, 20);
         scene.add(gridHelper);
 
-        // Main object with enhanced material
+        // Main object
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshPhongMaterial({ 
             color: 0x4f46e5,
@@ -177,8 +310,18 @@
         mainObject.receiveShadow = true;
         scene.add(mainObject);
 
-        // Particle system
+        // Variables
         let particles;
+        let selectedObject = mainObject;
+        const objects = [mainObject];
+        let moveSpeed = 0.1;
+        let isAnimating = true;
+        let showParticles = false;
+        let lastTime = performance.now();
+        let frameCount = 0;
+        const fpsArray = [];
+
+        // Particle system
         function createParticles() {
             const particleGeo = new THREE.BufferGeometry();
             const particleCount = 1000;
@@ -202,20 +345,6 @@
             updateParticleCount();
         }
 
-        // Camera position and controls
-        camera.position.z = 5;
-        camera.position.y = 2;
-        let selectedObject = mainObject;
-        const objects = [mainObject];
-        const moveSpeed = 0.1;
-        let isAnimating = true;
-        let showParticles = false;
-
-        // Performance monitoring
-        let lastTime = performance.now();
-        let frameCount = 0;
-        const fpsArray = [];
-        
         // Initialize chart
         const ctx = document.getElementById('performanceChart').getContext('2d');
         const performanceChart = new Chart(ctx, {
@@ -240,12 +369,16 @@
             }
         });
 
-        // Enhanced controls
+        // Camera setup
+        camera.position.z = 5;
+        camera.position.y = 2;
+
+        // Event Listeners
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
-        
+
         document.addEventListener('mousedown', (e) => {
-            if (e.button === 2) { // Right click
+            if (e.button === 2) {
                 isDragging = true;
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             }
@@ -296,28 +429,16 @@
             if (!selectedObject) return;
             
             switch(e.key.toLowerCase()) {
-                case 'w':
-                    selectedObject.position.z -= moveSpeed;
-                    break;
-                case 's':
-                    selectedObject.position.z += moveSpeed;
-                    break;
-                case 'a':
-                    selectedObject.position.x -= moveSpeed;
-                    break;
-                case 'd':
-                    selectedObject.position.x += moveSpeed;
-                    break;
-                case 'q':
-                    selectedObject.position.y += moveSpeed;
-                    break;
-                case 'e':
-                    selectedObject.position.y -= moveSpeed;
-                    break;
+                case 'w': selectedObject.position.z -= moveSpeed; break;
+                case 's': selectedObject.position.z += moveSpeed; break;
+                case 'a': selectedObject.position.x -= moveSpeed; break;
+                case 'd': selectedObject.position.x += moveSpeed; break;
+                case 'q': selectedObject.position.y += moveSpeed; break;
+                case 'e': selectedObject.position.y -= moveSpeed; break;
             }
         });
 
-        // Window resize handler
+        // Window resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -329,6 +450,22 @@
             if (!selectedObject) return;
             const color = Math.random() * 0xffffff;
             selectedObject.material.color.setHex(color);
+        }
+
+        function updateSize(size) {
+            if (selectedObject) {
+                selectedObject.scale.set(size, size, size);
+            }
+        }
+
+        function updateColor(color) {
+            if (selectedObject) {
+                selectedObject.material.color.setStyle(color);
+            }
+        }
+
+        function updateSpeed(speed) {
+            moveSpeed = speed * 0.1;
         }
 
         function addShape(type) {
