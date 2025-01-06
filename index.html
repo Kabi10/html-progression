@@ -1,52 +1,450 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Learning Journey</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Theme variables */
+        :root[data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: rgba(30, 41, 59, 0.95);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #7c3aed;
+            --card-bg: rgba(30, 41, 59, 0.8);
+        }
+        
+        :root[data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: rgba(241, 245, 249, 0.95);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #7c3aed;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Apply theme variables */
         body {
-            background: #0f172a;
-            color: #e2e8f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             font-family: 'Segoe UI', system-ui, sans-serif;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            padding: 0.5rem 0;
+            margin-bottom: 0.25rem;
+            height: 60px;
+        }
+        .display-4 {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            font-weight: bold;
+        }
+        .lead {
+            font-size: 0.75rem;
+            margin: 0;
+        }
+        .lesson-navigation {
+            position: fixed;
+            left: 2px;
+            top: 70px;
+            bottom: 30px;
+            background: rgba(30, 41, 59, 0.95);
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            z-index: 1000;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+        .lesson-navigation h5 {
+            font-size: 0.65rem;
+            margin: 0.15rem;
+            text-align: center;
+        }
+        .nav-pills {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .nav-pills .nav-link {
+            color: var(--text-primary);
+            background: rgba(79, 70, 229, 0.2);
+            margin: 0;
+            border-radius: 0.15rem;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.6rem;
+            line-height: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .nav-pills .nav-link:hover {
+            background: rgba(79, 70, 229, 0.4);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+        }
+        .nav-pills .nav-link.active {
+            background: #4f46e5;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+        }
+        .main-container {
+            position: fixed;
+            top: 70px;
+            left: 130px;
+            right: 8px;
+            bottom: 30px;
+            overflow-y: auto;
+        }
+        .row {
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.25rem;
+            padding: 0.25rem;
         }
         .card {
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            height: 80px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            transform: scaleX(0);
             transition: transform 0.3s ease;
+            transform-origin: left;
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .card:hover::before {
+            transform: scaleX(1);
         }
         .card-body {
             color: #e2e8f0;
-        }
-        .btn-primary {
-            background: #4f46e5;
-            border: none;
-        }
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-        .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            padding: 4rem 0;
-            margin-bottom: 3rem;
+            padding: 0.5rem;
+            position: relative;
         }
         .difficulty {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
+            top: 2px;
+            right: 2px;
+            padding: 0.1rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.6rem;
+            transition: all 0.3s ease;
+        }
+        .difficulty.basic {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+        .difficulty.intermediate {
+            background: rgba(234, 179, 8, 0.2);
+            color: #fde047;
+        }
+        .difficulty.advanced {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fdba74;
+        }
+        .difficulty.expert {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        .difficulty.capstone {
+            background: rgba(168, 85, 247, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        .card-title {
+            font-size: 0.7rem;
+            margin: 0 0 0.15rem 0;
+            padding-right: 3rem;
+        }
+        .card-text {
+            font-size: 0.6rem;
+            margin: 0;
+            line-height: 1.1;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            background: rgba(15, 23, 42, 0.9);
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        footer p {
+            margin: 0;
+        }
+        .lesson-content {
+            display: none;
+            height: 100%;
+        }
+        .lesson-content.active {
+            display: block;
+        }
+        #lessonFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 0.25rem;
+            background: white;
+        }
+        .back-to-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 8px;
+            z-index: 1000;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.65rem;
+            background: rgba(79, 70, 229, 0.9);
+            border: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        .back-to-menu:hover {
+            background: rgba(79, 70, 229, 1);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed;
+        }
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            display: none;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .loading-spinner::after {
+            content: 'Loading...';
+            display: block;
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: #e2e8f0;
+        }
+        .completion-dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            margin-right: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .completion-dot.completed {
+            background: #4ade80;
+        }
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 130px;
+            right: 8px;
+            height: 2px;
             background: rgba(79, 70, 229, 0.2);
-            color: #818cf8;
+            z-index: 1000;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: var(--progress, 0%);
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            transition: width 0.3s ease;
+        }
+        /* Add search bar */
+        .search-container {
+            position: fixed;
+            top: 70px;
+            left: 130px;
+            right: 8px;
+            height: 32px;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 0.25rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            top: 70px;
+            right: 8px;
+            z-index: 1002;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--accent-primary);
+        }
+
+        /* Keyboard shortcut hints */
+        .shortcut-hint {
+            position: absolute;
+            right: 0.5rem;
+            bottom: 0.5rem;
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover .shortcut-hint {
+            opacity: 1;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: toast-in-out 3s ease forwards;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        @keyframes toast-in-out {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* Adjust main container for search bar */
+        .main-container {
+            top: 110px;
+        }
+        
+        /* Progress percentage */
+        .progress-text {
+            position: absolute;
+            right: 8px;
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            line-height: 2px;
+        }
+
+        /* Card hover effect enhancement */
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), 
+                                      rgba(255,255,255,0.1) 0%, 
+                                      rgba(255,255,255,0) 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover::after {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <div class="header text-center">
         <div class="container">
             <h1 class="display-4 fw-bold">HTML Learning Journey</h1>
@@ -54,122 +452,373 @@
         </div>
     </div>
 
-    <div class="container pb-5">
-        <div class="row g-4">
-            <!-- Level 1 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search lessons (Press '/' to focus)" id="searchInput">
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (Alt+T)">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="toast-container"></div>
+
+    <div class="lesson-navigation">
+        <h5>Lessons</h5>
+        <div class="nav flex-column nav-pills" role="tablist">
+            <button class="nav-link active" onclick="showMenu()">
+                <span class="completion-dot"></span>Menu
+            </button>
+            <button class="nav-link" onclick="loadLesson(1)">
+                <span class="completion-dot"></span>1. HTML Basics
+            </button>
+            <button class="nav-link" onclick="loadLesson(2)">
+                <span class="completion-dot"></span>2. CSS Styling
+            </button>
+            <button class="nav-link" onclick="loadLesson(3)">
+                <span class="completion-dot"></span>3. Advanced Styling
+            </button>
+            <button class="nav-link" onclick="loadLesson(4)">
+                <span class="completion-dot"></span>4. Form Validation
+            </button>
+            <button class="nav-link" onclick="loadLesson(5)">
+                <span class="completion-dot"></span>5. Animations
+            </button>
+            <button class="nav-link" onclick="loadLesson(6)">
+                <span class="completion-dot"></span>6. Responsive Design
+            </button>
+            <button class="nav-link" onclick="loadLesson(7)">
+                <span class="completion-dot"></span>7. Interactive Dashboard
+            </button>
+            <button class="nav-link" onclick="loadLesson(8)">
+                <span class="completion-dot"></span>8. Augmented Reality
+            </button>
+            <button class="nav-link" onclick="loadLesson(9)">
+                <span class="completion-dot"></span>9. 3D Dashboard
+            </button>
+            <button class="nav-link" onclick="loadLesson(10)">
+                <span class="completion-dot"></span>10. Capstone Project
+            </button>
+        </div>
+    </div>
+
+    <div class="progress-bar"></div>
+
+    <div class="main-container">
+        <!-- Main Menu -->
+        <div id="menuContent" class="lesson-content active">
+            <div class="row">
+                <!-- Your existing cards -->
+                <!-- Level 1 -->
+                <div class="card" onclick="loadLesson(1)">
                     <div class="card-body">
-                        <span class="difficulty">Basic</span>
+                        <span class="difficulty basic">Basic</span>
                         <h5 class="card-title">Level 1: HTML Basics</h5>
                         <p class="card-text">Learn the fundamentals of HTML structure and essential elements.</p>
-                        <a href="html-lessons/01-html-basics.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+1</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 2 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 2 -->
+                <div class="card" onclick="loadLesson(2)">
                     <div class="card-body">
-                        <span class="difficulty">Basic</span>
+                        <span class="difficulty basic">Basic</span>
                         <h5 class="card-title">Level 2: CSS Styling</h5>
                         <p class="card-text">Introduction to CSS and basic styling techniques.</p>
-                        <a href="html-lessons/02-css-styling.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+2</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 3 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 3 -->
+                <div class="card" onclick="loadLesson(3)">
                     <div class="card-body">
-                        <span class="difficulty">Intermediate</span>
+                        <span class="difficulty intermediate">Intermediate</span>
                         <h5 class="card-title">Level 3: Advanced Styling</h5>
                         <p class="card-text">Complex CSS techniques and Bootstrap integration.</p>
-                        <a href="html-lessons/03-advanced-styling.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+3</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 4 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 4 -->
+                <div class="card" onclick="loadLesson(4)">
                     <div class="card-body">
-                        <span class="difficulty">Intermediate</span>
+                        <span class="difficulty intermediate">Intermediate</span>
                         <h5 class="card-title">Level 4: Form Validation</h5>
                         <p class="card-text">Working with forms and implementing validation.</p>
-                        <a href="html-lessons/04-form-validation.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+4</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 5 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 5 -->
+                <div class="card" onclick="loadLesson(5)">
                     <div class="card-body">
-                        <span class="difficulty">Intermediate</span>
+                        <span class="difficulty intermediate">Intermediate</span>
                         <h5 class="card-title">Level 5: Animations</h5>
                         <p class="card-text">CSS animations and visual effects.</p>
-                        <a href="html-lessons/05-animations.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+5</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 6 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 6 -->
+                <div class="card" onclick="loadLesson(6)">
                     <div class="card-body">
-                        <span class="difficulty">Advanced</span>
+                        <span class="difficulty advanced">Advanced</span>
                         <h5 class="card-title">Level 6: Responsive Design</h5>
                         <p class="card-text">Creating layouts that work on all devices.</p>
-                        <a href="html-lessons/06-responsive-design.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+6</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 7 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 7 -->
+                <div class="card" onclick="loadLesson(7)">
                     <div class="card-body">
-                        <span class="difficulty">Advanced</span>
+                        <span class="difficulty advanced">Advanced</span>
                         <h5 class="card-title">Level 7: Interactive Dashboard</h5>
                         <p class="card-text">Building a dynamic dashboard with real-time updates.</p>
-                        <a href="html-lessons/07-interactive-dashboard.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+7</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 8 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 8 -->
+                <div class="card" onclick="loadLesson(8)">
                     <div class="card-body">
-                        <span class="difficulty">Expert</span>
+                        <span class="difficulty expert">Expert</span>
                         <h5 class="card-title">Level 8: Augmented Reality</h5>
                         <p class="card-text">Introduction to AR with A-Frame framework.</p>
-                        <a href="html-lessons/08-augmented-reality.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+8</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Level 9 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
+                <!-- Level 9 -->
+                <div class="card" onclick="loadLesson(9)">
                     <div class="card-body">
-                        <span class="difficulty">Expert</span>
+                        <span class="difficulty expert">Expert</span>
                         <h5 class="card-title">Level 9: 3D Dashboard</h5>
                         <p class="card-text">Advanced 3D graphics with Three.js and performance monitoring.</p>
-                        <a href="html-lessons/09-3d-dashboard.html" class="btn btn-primary">View Lesson</a>
+                        <span class="shortcut-hint">Press Alt+9</span>
+                    </div>
+                </div>
+
+                <!-- Level 10 -->
+                <div class="card" onclick="loadLesson(10)">
+                    <div class="card-body">
+                        <span class="difficulty capstone">Capstone</span>
+                        <h5 class="card-title">Level 10: Full-Stack Portfolio</h5>
+                        <p class="card-text">Build a dynamic portfolio with 3D elements, real-time data, and AI integration.</p>
+                        <span class="shortcut-hint">Press Alt+0</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Lesson Content -->
+        <div id="lessonContent" class="lesson-content">
+            <iframe id="lessonFrame" frameborder="0"></iframe>
+        </div>
     </div>
 
-    <footer class="text-center py-4">
-        <p>Created with ❤️ by Kabi10</p>
+    <button onclick="showMenu()" class="back-to-menu btn btn-primary" style="display: none;">
+        Back to Menu
+    </button>
+
+    <footer>
+        <p>Created with ❤️ by Kabi</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const menuContent = document.getElementById('menuContent');
+        const lessonContent = document.getElementById('lessonContent');
+        const lessonFrame = document.getElementById('lessonFrame');
+        const backButton = document.querySelector('.back-to-menu');
+        const spinner = document.querySelector('.loading-spinner');
+        const navButtons = document.querySelectorAll('.nav-link');
+
+        function showMenu() {
+            menuContent.classList.add('active');
+            lessonContent.classList.remove('active');
+            backButton.style.display = 'none';
+            updateNavigation('Menu');
+        }
+
+        function loadLesson(level) {
+            spinner.style.display = 'block';
+            menuContent.classList.remove('active');
+            lessonContent.classList.add('active');
+            backButton.style.display = 'block';
+
+            const lessonFiles = {
+                1: '01-html-basics.html',
+                2: '02-css-styling.html',
+                3: '03-advanced-styling.html',
+                4: '04-form-validation.html',
+                5: '05-animations.html',
+                6: '06-responsive-design.html',
+                7: '07-interactive-dashboard.html',
+                8: '08-augmented-reality.html',
+                9: '09-3d-dashboard.html',
+                10: '10-capstone-portfolio.html'
+            };
+
+            lessonFrame.src = `html-lessons/${lessonFiles[level]}`;
+            updateNavigation(`${level}. ${getLessonTitle(level)}`);
+
+            lessonFrame.onload = () => {
+                spinner.style.display = 'none';
+                markLessonComplete(level);
+            };
+        }
+
+        function updateNavigation(activeItem) {
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent.includes(activeItem)) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        function getLessonTitle(level) {
+            const titles = {
+                1: 'HTML Basics',
+                2: 'CSS Styling',
+                3: 'Advanced Styling',
+                4: 'Form Validation',
+                5: 'Animations',
+                6: 'Responsive Design',
+                7: 'Interactive Dashboard',
+                8: 'Augmented Reality',
+                9: '3D Dashboard',
+                10: 'Full-Stack Portfolio'
+            };
+            return titles[level];
+        }
+
+        // Handle browser back button
+        window.onpopstate = function(event) {
+            if (event.state === null) {
+                showMenu();
+            }
+        };
+
+        // Initialize history
+        history.replaceState({ page: 'menu' }, '');
+
+        // Add progress tracking
+        let completedLessons = new Set();
+        let totalLessons = 10;
+
+        function updateProgress() {
+            const progress = (completedLessons.size / totalLessons) * 100;
+            document.querySelector('.progress-bar').style.setProperty('--progress', `${progress}%`);
+        }
+
+        function markLessonComplete(level) {
+            completedLessons.add(level);
+            updateProgress();
+            const dot = document.querySelector(`.nav-link:nth-child(${level + 1}) .completion-dot`);
+            if (dot) dot.classList.add('completed');
+            localStorage.setItem('completedLessons', JSON.stringify([...completedLessons]));
+        }
+
+        // Load saved progress
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('completedLessons');
+            if (saved) {
+                completedLessons = new Set(JSON.parse(saved));
+                updateProgress();
+                completedLessons.forEach(level => {
+                    const dot = document.querySelector(`.nav-link:nth-child(${level + 1}) .completion-dot`);
+                    if (dot) dot.classList.add('completed');
+                });
+            }
+        });
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            showToast(`Switched to ${newTheme} theme`);
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.querySelector('.toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        
+        function filterLessons(query) {
+            const cards = document.querySelectorAll('.card');
+            const normalizedQuery = query.toLowerCase();
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const text = card.querySelector('.card-text').textContent.toLowerCase();
+                const matches = title.includes(normalizedQuery) || text.includes(normalizedQuery);
+                card.style.display = matches ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => filterLessons(e.target.value));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Search focus
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            
+            // Theme toggle
+            if (e.altKey && e.key === 't') {
+                e.preventDefault();
+                toggleTheme();
+            }
+            
+            // Lesson shortcuts
+            if (e.altKey && !isNaN(e.key) && e.key !== '0') {
+                e.preventDefault();
+                const lessonNum = parseInt(e.key);
+                if (lessonNum <= 10) {
+                    loadLesson(lessonNum);
+                    showToast(`Loading Lesson ${lessonNum}`);
+                }
+            }
+            
+            // Menu shortcut
+            if (e.altKey && e.key === 'm') {
+                e.preventDefault();
+                showMenu();
+                showToast('Returned to menu');
+            }
+        });
+
+        // Card hover effect
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--x', `${x}%`);
+                card.style.setProperty('--y', `${y}%`);
+            });
+        });
+
+        // Load saved theme
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        });
+    </script>
 </body>
 </html> 
