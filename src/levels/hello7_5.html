@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 8 Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-weight: 400;
+        }
+
+        /* Neon Gradient Theme */
+        .header {
+            background: linear-gradient(90deg, rgba(0,255,255,1) 0%, rgba(0,212,255,1) 100%);
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Widget Styling */
+        .widget {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .widget:hover {
+            transform: scale(1.05);
+            background: rgba(0, 255, 255, 0.15);
+        }
+
+        /* Crypto Graph */
+        #crypto-graph {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+        }
+
+        /* Weather Info */
+        .weather-widget {
+            background: linear-gradient(45deg, #f06, #4b0082);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* Chatbot Styling */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .chatbot-box {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 300px;
+            background: #222;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .chatbot-box.active {
+            display: block;
+        }
+
+        .chatbot-box h3 {
+            margin-top: 0;
+        }
+
+        .chatbot-box input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .chatbot-box button {
+            margin-top: 10px;
+            padding: 10px;
+            background: #00d4ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .chatbot-box button:hover {
+            background: #00a8c6;
+        }
+
+        .output {
+            margin-top: 15px;
+        }
+
+        .output p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Level 8 Interactive Dashboard</h1>
+        <p>Explore live data and interactive features!</p>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Crypto Graph -->
+        <div class="widget" id="crypto-widget">
+            <h2>Bitcoin Price</h2>
+            <div id="crypto-graph"></div>
+        </div>
+
+        <!-- Weather Info -->
+        <div class="widget weather-widget">
+            <h3>Weather in Surrey</h3>
+            <p>Temp: 20°C | Clear Skies</p>
+            <p>Humidity: 65% | Wind: 5 km/h</p>
+        </div>
+
+        <!-- Customizable Chatbot -->
+        <div class="widget" id="chatbot-widget">
+            <h2>Chat with Assistant</h2>
+            <p>Click the button below to talk to our AI-powered assistant.</p>
+        </div>
+    </div>
+
+    <!-- Floating Chatbot Button -->
+    <div class="chatbot-widget" id="chatbot-toggle">
+        <h2>💬</h2>
+    </div>
+
+    <!-- Chatbot Box -->
+    <div class="chatbot-box" id="chatbot-box">
+        <h3>Hi, how can I help you today?</h3>
+        <input type="text" id="user-input" placeholder="Ask me anything...">
+        <button id="send-button">Send</button>
+        <div class="output" id="chatbot-output"></div>
+    </div>
+
+    <script>
+        // Toggle chatbot box visibility
+        document.getElementById('chatbot-toggle').onclick = function() {
+            const chatbotBox = document.getElementById('chatbot-box');
+            chatbotBox.classList.toggle('active');
+        };
+
+        // Handle user input and respond
+        document.getElementById('send-button').onclick = function() {
+            const userInput = document.getElementById('user-input').value;
+            const chatbotOutput = document.getElementById('chatbot-output');
+
+            // Basic dynamic response
+            if (userInput) {
+                chatbotOutput.innerHTML = '<p><strong>You:</strong> ' + userInput + '</p><p><strong>Assistant:</strong> I can help you with live data and more!</p>';
+                document.getElementById('user-input').value = ''; // Clear input after sending
+            }
+        };
+
+        // Simulate a live graph update (for demonstration)
+        const ctx = document.getElementById('crypto-graph').getContext('2d');
+        const cryptoChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'BTC Price ($)',
+                    data: [40000, 42000, 45000, 50000, 48000, 52000],
+                    borderColor: 'rgba(0, 255, 255, 0.8)',
+                    fill: false,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>

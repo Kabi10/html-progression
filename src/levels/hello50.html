@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 50 AR Experience</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #info { position: absolute; top: 20px; left: 20px; color: white; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div id="info">Welcome to the Future of AR! Interact with the world.</div>
+    <a-scene embedded arjs>
+        <!-- Marker-based AR (use Hiro marker) -->
+        <a-marker preset="hiro">
+            <!-- Dynamic 3D object that changes over time -->
+            <a-box position="0 0.5 0" material="color: blue; opacity: 0.8" animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+            <!-- Interactive Avatar -->
+            <a-entity position="0 0.5 1" id="avatar" gltf-model="url(https://example.com/avatar.glb)" animation__walk="property: position; to: 5 0.5 1; dur: 5000; loop: true"></a-entity>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <!-- Advanced Object Interaction via Gesture or Click -->
+    <script>
+        // Custom interaction for object scaling and rotation
+        let box = document.querySelector('a-box');
+        box.addEventListener('click', function () {
+            let scale = box.getAttribute('scale');
+            box.setAttribute('scale', { x: scale.x + 0.1, y: scale.y + 0.1, z: scale.z + 0.1 });
+        });
+
+        // Example of using AI for personalized experience
+        let userBehavior = 'greeted'; // Placeholder for behavior tracking
+        if (userBehavior === 'greeted') {
+            document.getElementById('info').textContent = 'Hey there! Welcome back!';
+        }
+    </script>
+</body>
+</html>

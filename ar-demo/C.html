@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Auto-Recording</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #info { position: absolute; top: 20px; left: 20px; color: white; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div id="info">AR Auto Recording is Active!</div>
+    <a-scene embedded arjs>
+        <!-- Marker-based AR (use Hiro marker) -->
+        <a-marker preset="hiro">
+            <!-- Dynamic 3D object that changes over time -->
+            <a-box position="0 0.5 0" material="color: blue; opacity: 0.8" animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+            <!-- Interactive Avatar -->
+            <a-entity position="0 0.5 1" id="avatar" gltf-model="url(https://example.com/avatar.glb)" animation__walk="property: position; to: 5 0.5 1; dur: 5000; loop: true"></a-entity>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Initialize recording when the page loads
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        // Access user's camera and start recording
+        async function startRecording() {
+            // Get the video stream from the AR scene (camera)
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            
+            // Create a MediaRecorder instance to capture the video
+            mediaRecorder = new MediaRecorder(stream);
+
+            // Event handler for dataavailable (new video chunk available)
+            mediaRecorder.ondataavailable = (event) => {
+                recordedChunks.push(event.data);
+            };
+
+            // Event handler for stop recording (when the recording stops)
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+
+                // Create a download link for the recorded video
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'recorded_video.webm';
+                link.click();
+            };
+
+            // Start recording automatically
+            mediaRecorder.start();
+            console.log("Recording started!");
+
+            // Stop the recording after 30 seconds (or any duration you like)
+            setTimeout(() => {
+                mediaRecorder.stop();
+                console.log("Recording stopped!");
+            }, 30000); // 30 seconds for this example
+        }
+
+        // Start recording when AR.js scene loads
+        window.onload = function() {
+            startRecording();
+        };
+    </script>
+</body>
+</html>
