@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced CSS animations and effects">
+    <title>Advanced Effects - Level 4</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <style>
+        /* Keep existing CSS Variables */
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #22c55e;
+            --surface-1: #ffffff;
+            --surface-2: #f9fafb;
+            --text-1: #111827;
+            --text-2: #4b5563;
+            
+            --gradient-1: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            --gradient-2: linear-gradient(45deg, #4f46e5 0%, #0ea5e9 100%);
+            --gradient-3: linear-gradient(to right, #22c55e 0%, #10b981 100%);
+        }
+
+        /* Keep Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface-1: #1f2937;
+                --surface-2: #374151;
+                --text-1: #f9fafb;
+                --text-2: #e5e7eb;
+            }
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.5;
+            background: var(--surface-1);
+            color: var(--text-1);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Interactive Background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: top;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            from { background-position: 0 0; }
+            to { background-position: 0 40px; }
+        }
+
+        /* Floating Elements */
+        .floating-shapes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.4;
+            animation: float 20s infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            background: var(--gradient-1);
+            top: -200px;
+            left: -200px;
+        }
+
+        .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            background: var(--gradient-2);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+
+        /* Main Content */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        /* Interactive Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card:hover::before {
+            opacity: 0.1;
+        }
+
+        /* Card Content */
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Interactive Elements */
+        .interactive-element {
+            width: 100px;
+            height: 100px;
+            margin: 2rem auto;
+            background: var(--gradient-1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .interactive-element {
+            transform: rotate(45deg) scale(1.1);
+            background: var(--gradient-2);
+        }
+
+        /* Pulse Animation */
+        .pulse {
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border: 2px solid var(--primary);
+            border-radius: inherit;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* Wave Effect */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: var(--gradient-3);
+            opacity: 0.1;
+            transform-origin: bottom;
+            animation: wave 5s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.2); }
+        }
+
+        /* Particle System */
+        .particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: particle-float 3s ease-in-out infinite;
+        }
+
+        @keyframes particle-float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, -10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Card 1: Morphing Shapes -->
+        <div class="card">
+            <div class="card-content">
+                <h2>Morphing Shapes</h2>
+                <div class="interactive-element pulse"></div>
+                <p>Hover to transform the shape and trigger animations.</p>
+            </div>
+        </div>
+
+        <!-- Card 2: Wave Effects -->
+        <div class="card">
+            <div class="card-content">
+                <h2>Wave Animation</h2>
+                <div class="interactive-element">
+                    <div class="wave"></div>
+                </div>
+                <p>Dynamic wave effect with gradient colors.</p>
+            </div>
+        </div>
+
+        <!-- Card 3: Particle System -->
+        <div class="card">
+            <div class="card-content">
+                <h2>Particle System</h2>
+                <div class="interactive-element">
+                    <div class="particles">
+                        <div class="particle" style="top: 20%; left: 30%;"></div>
+                        <div class="particle" style="top: 60%; left: 50%;"></div>
+                        <div class="particle" style="top: 40%; left: 70%;"></div>
+                    </div>
+                </div>
+                <p>Interactive particle animations.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add dynamic particles
+        function createParticles() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    
+                    card.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 1000);
+                });
+            });
+        }
+
+        createParticles();
+    </script>
+</body>
+</html>

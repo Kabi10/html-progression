@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 6: Responsive Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --text-dark: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+
+        .main {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .left-section {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 1rem;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Stats Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .card__title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .card__icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 0.75rem;
+            display: grid;
+            place-items: center;
+            color: white;
+        }
+
+        .card__value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .card__change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .card__change--up { color: var(--success); }
+        .card__change--down { color: var(--danger); }
+
+        /* News Feed */
+        .news-feed {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .news-source {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+
+        /* Chat Bot */
+        .chat-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            margin: -1rem -1rem -1rem 0;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .chat-messages {
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 0.5rem;
+            height: calc(100vh - 140px);
+            margin: 1rem 0;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-message.user .message-content {
+            background: var(--primary);
+            color: white;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            opacity: 0.9;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: var(--bg-dark);
+                color: var(--text-light);
+            }
+
+            .card, .news-feed, .chat-container {
+                background: rgba(255, 255, 255, 0.03);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .card__title, .card__value, .news-title {
+                color: var(--text-light);
+            }
+
+            .message-content {
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text-light);
+            }
+
+            .chat-input input {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.1);
+                color: var(--text-light);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <main class="main">
+            <div class="left-section">
+                <header class="header">
+                    <h1 class="header__title">Dashboard Overview</h1>
+                    <div class="header__actions">
+                        <span id="lastUpdate">Last update: Loading...</span>
+                    </div>
+                </header>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Bitcoin Price</h3>
+                            <div class="card__icon" style="background: var(--primary)">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card__value" id="btcPrice">Loading...</div>
+                        <div class="card__change" id="btcChange">
+                            <span class="loading">Updating...</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">Weather</h3>
+                            <div class="card__icon" style="background: var(--secondary)">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card__value" id="weather">Loading...</div>
+                        <div class="card__change" id="weatherUpdate">
+                            <span class="loading">Updating...</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 class="card__title">System Status</h3>
+                            <div class="card__icon" style="background: var(--accent)">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card__value">All Systems Operational</div>
+                        <div class="card__change card__change--up">100% Uptime</div>
+                    </div>
+                </div>
+
+                <div class="news-feed">
+                    <h2 class="card__title">Latest Tech News</h2>
+                    <div id="newsList">
+                        <!-- News items will be added here -->
+            </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h2 class="card__title">AI Assistant</h2>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Chat messages will appear here -->
+            </div>
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="Ask me anything..." />
+                    <button onclick="sendMessage()">Send</button>
+        </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global state for bot context
+        let globalData = {
+            btcPrice: null,
+            btcChange: null,
+            weather: null,
+            news: []
+        };
+
+        // Real-time Data Updates
+        const fetchData = async () => {
+            try {
+                // BTC Price Update (CoinGecko API - no key required)
+                const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
+                const btcData = await btcRes.json();
+                const price = btcData.bitcoin.usd;
+                const change = btcData.bitcoin.usd_24h_change.toFixed(2);
+                
+                globalData.btcPrice = price;
+                globalData.btcChange = change;
+                
+                document.getElementById('btcPrice').textContent = `$${price.toLocaleString()}`;
+                document.getElementById('btcChange').innerHTML = `
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="${change >= 0 ? 'M5 10l7-7m0 0h-6m6 0v6' : 'M19 14l-7 7m0 0l-7-7m7 7V3'}" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    ${change >= 0 ? '+' : ''}${change}%
+                `;
+                document.getElementById('btcChange').className = `card__change card__change--${change >= 0 ? 'up' : 'down'}`;
+
+                // Weather Update (OpenMeteo API - no key required)
+                const weatherRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current_weather=true&temperature_unit=celsius');
+                const weatherData = await weatherRes.json();
+                const temp = weatherData.current_weather.temperature;
+                globalData.weather = temp;
+                
+                document.getElementById('weather').textContent = `${temp}°C`;
+                document.getElementById('weatherUpdate').textContent = 'Updated just now';
+
+                // Tech News (HackerNews API - no key required)
+                const topStoriesRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+                const topStories = await topStoriesRes.json();
+                const storyPromises = topStories.slice(0, 5).map(id => 
+                    fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(res => res.json())
+                );
+                const stories = await Promise.all(storyPromises);
+                globalData.news = stories;
+                updateNewsFeed(stories);
+
+                // Update timestamp
+                document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            }
+        };
+
+        // News Feed Update
+        const updateNewsFeed = (stories) => {
+            const newsList = document.getElementById('newsList');
+            newsList.innerHTML = stories.map(story => `
+                <div class="news-item">
+                    <div class="news-title">
+                        <a href="${story.url}" target="_blank" style="color: inherit; text-decoration: none;">
+                            ${story.title}
+                        </a>
+                    </div>
+                    <div class="news-source">
+                        ${story.by} • ${story.score} points • ${new Date(story.time * 1000).toLocaleDateString()}
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // Chat Bot
+        const sendMessage = () => {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim().toLowerCase();
+            if (!message) return;
+
+            // Add user message
+            addChatMessage(message, true);
+            input.value = '';
+
+            // Process message and generate response
+            let response = processMessage(message);
+                setTimeout(() => {
+                addChatMessage(response, false);
+            }, 500);
+        };
+
+        const processMessage = (message) => {
+            // Check for greetings
+            if (message.match(/^(hi|hello|hey|howdy)/i)) {
+                return "Hello! I can help you with information about Bitcoin prices, weather, and tech news. What would you like to know?";
+            }
+
+            // Bitcoin related queries
+            if (message.includes('bitcoin') || message.includes('btc') || message.includes('price')) {
+                return `Bitcoin is currently trading at $${globalData.btcPrice.toLocaleString()} (${globalData.btcChange >= 0 ? '+' : ''}${globalData.btcChange}% in the last 24h).`;
+            }
+
+            // Weather related queries
+            if (message.includes('weather') || message.includes('temperature')) {
+                return `The current temperature in New York is ${globalData.weather}°C.`;
+            }
+
+            // News related queries
+            if (message.includes('news') || message.includes('stories') || message.includes('updates')) {
+                const latestNews = globalData.news[0];
+                return `The top tech story right now is: "${latestNews.title}". Would you like to know more about specific topics?`;
+            }
+
+            // Help command
+            if (message.includes('help') || message.includes('what can you do')) {
+                return `I can help you with:
+1. Bitcoin price updates and trends
+2. Current weather information
+3. Latest tech news and stories
+Just ask me about any of these topics!`;
+            }
+
+            // Default response with suggestion
+            return "I can help you with Bitcoin prices, weather updates, or tech news. Which would you like to know about?";
+        };
+
+        const addChatMessage = (text, isUser) => {
+            const messages = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `chat-message ${isUser ? 'user' : ''}`;
+            message.innerHTML = `
+                <div class="message-content">${text}</div>
+            `;
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        };
+
+        // Enter key for chat
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initial welcome message
+        setTimeout(() => {
+            addChatMessage("Hello! I'm your AI assistant. I can help you with Bitcoin prices, weather updates, and tech news. What would you like to know?", false);
+        }, 1000);
+
+        // Initial load
+        fetchData();
+
+        // Refresh every 30 seconds
+        setInterval(fetchData, 30000);
+    </script>
+</body>
+</html>

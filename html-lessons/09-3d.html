@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 9: Advanced 3D Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+        }
+        .overlay {
+            position: fixed;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+        #controls {
+            top: 20px;
+            left: 20px;
+        }
+        #stats {
+            top: 20px;
+            right: 20px;
+            width: 200px;
+        }
+        #charts {
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 200px;
+        }
+        .button-group {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 15px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        #particleCount {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
+        .shape-controls {
+            position: fixed;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+        }
+        #performance {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls" class="overlay">
+        <h3>Advanced Controls</h3>
+        <p>🖱️ Right-click + drag to orbit</p>
+        <p>⚡ WASD to move selected object</p>
+        <p>↕️ QE to move up/down</p>
+        <p>🎯 Click object to select</p>
+        <div class="button-group">
+            <button onclick="changeColor()">Random Color</button>
+            <button onclick="addObject()">Add Object</button>
+            <button onclick="toggleAnimation()">Toggle Animation</button>
+            <button onclick="toggleParticles()">Toggle Particles</button>
+            <button onclick="resetScene()">Reset Scene</button>
+        </div>
+    </div>
+
+    <div id="stats" class="overlay">
+        <h3>Scene Statistics</h3>
+        <div class="stat">
+            <span>Objects:</span>
+            <span id="objectCount">1</span>
+        </div>
+        <div class="stat">
+            <span>Particles:</span>
+            <span id="particleStats">0</span>
+        </div>
+        <div class="stat">
+            <span>FPS:</span>
+            <span id="fps">60</span>
+        </div>
+    </div>
+
+    <div id="charts" class="overlay">
+        <canvas id="performanceChart"></canvas>
+    </div>
+
+    <div id="performance" class="overlay">
+        <span id="performanceText">Performance: Excellent</span>
+    </div>
+
+    <div class="shape-controls overlay">
+        <h3>Shapes</h3>
+        <div class="button-group">
+            <button onclick="addShape('cube')">Cube</button>
+            <button onclick="addShape('sphere')">Sphere</button>
+            <button onclick="addShape('torus')">Torus</button>
+            <button onclick="addShape('pyramid')">Pyramid</button>
+        </div>
+    </div>
+
+    <script>
+        // Scene setup with advanced features
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0f172a, 0.1);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Enhanced lighting
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const pointLight = new THREE.PointLight(0x00ff00, 1, 100);
+        pointLight.position.set(0, 5, 0);
+        scene.add(pointLight);
+
+        // Grid helper
+        const gridHelper = new THREE.GridHelper(20, 20);
+        scene.add(gridHelper);
+
+        // Main object with enhanced material
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshPhongMaterial({ 
+            color: 0x4f46e5,
+            specular: 0x050505,
+            shininess: 100,
+            metalness: 0.5,
+            roughness: 0.5
+        });
+        const mainObject = new THREE.Mesh(geometry, material);
+        mainObject.castShadow = true;
+        mainObject.receiveShadow = true;
+        scene.add(mainObject);
+
+        // Particle system
+        let particles;
+        function createParticles() {
+            const particleGeo = new THREE.BufferGeometry();
+            const particleCount = 1000;
+            const posArray = new Float32Array(particleCount * 3);
+            
+            for(let i = 0; i < particleCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0x4f46e5,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+            updateParticleCount();
+        }
+
+        // Camera position and controls
+        camera.position.z = 5;
+        camera.position.y = 2;
+        let selectedObject = mainObject;
+        const objects = [mainObject];
+        const moveSpeed = 0.1;
+        let isAnimating = true;
+        let showParticles = false;
+
+        // Performance monitoring
+        let lastTime = performance.now();
+        let frameCount = 0;
+        const fpsArray = [];
+        
+        // Initialize chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'FPS',
+                    data: [],
+                    borderColor: '#4f46e5',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Enhanced controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 2) { // Right click
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+
+                camera.position.x += deltaMove.x * 0.01;
+                camera.position.y -= deltaMove.y * 0.01;
+                camera.lookAt(scene.position);
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Object selection
+        renderer.domElement.addEventListener('click', (event) => {
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objects);
+            
+            if (intersects.length > 0) {
+                selectedObject = intersects[0].object;
+                selectedObject.material.emissive.setHex(0x666666);
+                objects.forEach(obj => {
+                    if (obj !== selectedObject) {
+                        obj.material.emissive.setHex(0x000000);
+                    }
+                });
+            }
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!selectedObject) return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'w':
+                    selectedObject.position.z -= moveSpeed;
+                    break;
+                case 's':
+                    selectedObject.position.z += moveSpeed;
+                    break;
+                case 'a':
+                    selectedObject.position.x -= moveSpeed;
+                    break;
+                case 'd':
+                    selectedObject.position.x += moveSpeed;
+                    break;
+                case 'q':
+                    selectedObject.position.y += moveSpeed;
+                    break;
+                case 'e':
+                    selectedObject.position.y -= moveSpeed;
+                    break;
+            }
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // UI Functions
+        function changeColor() {
+            if (!selectedObject) return;
+            const color = Math.random() * 0xffffff;
+            selectedObject.material.color.setHex(color);
+        }
+
+        function addShape(type) {
+            let geometry;
+            switch(type) {
+                case 'sphere':
+                    geometry = new THREE.SphereGeometry(0.5, 32, 32);
+                    break;
+                case 'torus':
+                    geometry = new THREE.TorusGeometry(0.5, 0.2, 16, 100);
+                    break;
+                case 'pyramid':
+                    geometry = new THREE.ConeGeometry(0.5, 1, 4);
+                    break;
+                default:
+                    geometry = new THREE.BoxGeometry();
+            }
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: Math.random() * 0xffffff,
+                specular: 0x050505,
+                shininess: 100
+            });
+            
+            const object = new THREE.Mesh(geometry, material);
+            object.position.set(
+                (Math.random() - 0.5) * 5,
+                (Math.random() - 0.5) * 5,
+                (Math.random() - 0.5) * 5
+            );
+            object.castShadow = true;
+            object.receiveShadow = true;
+            
+            scene.add(object);
+            objects.push(object);
+            selectedObject = object;
+            
+            updateObjectCount();
+        }
+
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+        }
+
+        function toggleParticles() {
+            showParticles = !showParticles;
+            if (showParticles && !particles) {
+                createParticles();
+            } else if (particles) {
+                scene.remove(particles);
+                particles = null;
+            }
+            updateParticleCount();
+        }
+
+        function resetScene() {
+            objects.forEach(obj => {
+                if (obj !== mainObject) {
+                    scene.remove(obj);
+                }
+            });
+            objects.length = 1;
+            mainObject.position.set(0, 0, 0);
+            mainObject.rotation.set(0, 0, 0);
+            selectedObject = mainObject;
+            updateObjectCount();
+        }
+
+        // Stats updates
+        function updateObjectCount() {
+            document.getElementById('objectCount').textContent = objects.length;
+        }
+
+        function updateParticleCount() {
+            document.getElementById('particleStats').textContent = particles ? '1000' : '0';
+        }
+
+        function updatePerformance() {
+            const currentTime = performance.now();
+            frameCount++;
+
+            if (currentTime > lastTime + 1000) {
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                document.getElementById('fps').textContent = fps;
+                
+                // Update chart
+                fpsArray.push(fps);
+                if (fpsArray.length > 30) fpsArray.shift();
+                
+                performanceChart.data.labels = fpsArray.map((_, i) => i);
+                performanceChart.data.datasets[0].data = fpsArray;
+                performanceChart.update();
+
+                // Update performance text
+                const performanceText = fps > 50 ? 'Excellent' : fps > 30 ? 'Good' : 'Poor';
+                document.getElementById('performanceText').textContent = `Performance: ${performanceText}`;
+
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isAnimating) {
+                objects.forEach(obj => {
+                    obj.rotation.x += 0.01;
+                    obj.rotation.y += 0.01;
+                });
+            }
+
+            if (particles) {
+                particles.rotation.y += 0.001;
+            }
+
+            updatePerformance();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html> 

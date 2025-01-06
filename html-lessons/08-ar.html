@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 8: Advanced AR Experience</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: rgba(15, 23, 42, 0.9);
+            --text-light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* UI Overlay */
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-dot.recording {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 1rem;
+            background: var(--bg-dark);
+            padding: 1rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn.recording {
+            background: var(--danger);
+        }
+
+        /* Scene Info */
+        .scene-info {
+            position: fixed;
+            top: 5rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--bg-dark);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .scene-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .scene-info p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Object Controls */
+        .object-controls {
+            position: fixed;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: var(--bg-dark);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 30px;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: var(--bg-dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- UI Overlay -->
+    <div class="ui-overlay">
+        <div class="status">
+            <div class="status-dot"></div>
+            <span>AR Ready</span>
+        </div>
+        <div class="timer">00:00</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn" id="recordBtn" onclick="toggleRecording()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="10" cy="10" r="6"/>
+            </svg>
+            Start Recording
+        </button>
+        <button class="btn" onclick="capturePhoto()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Take Photo
+        </button>
+    </div>
+
+    <!-- Scene Info -->
+    <div class="scene-info">
+        <h3>AR Scene Information</h3>
+        <p>Use the Hiro marker to view the 3D objects. The scene includes an interactive cube and an animated avatar.</p>
+        <p>Recording will automatically stop after 30 seconds.</p>
+    </div>
+
+    <!-- Object Controls -->
+    <div class="object-controls">
+        <div class="control-group">
+            <label>Rotation Speed</label>
+            <input type="range" min="1" max="10" value="5" onchange="updateRotationSpeed(this.value)">
+        </div>
+        <div class="control-group">
+            <label>Object Color</label>
+            <input type="color" value="#4f46e5" onchange="updateObjectColor(this.value)">
+        </div>
+        <div class="control-group">
+            <label>Scale</label>
+            <input type="range" min="0.5" max="2" step="0.1" value="1" onchange="updateObjectScale(this.value)">
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- AR Scene -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;">
+        <a-marker preset="hiro" id="marker">
+            <!-- Interactive 3D Cube -->
+            <a-box id="arCube"
+                position="0 0.5 0"
+                material="color: #4f46e5; opacity: 0.8"
+                animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 5000"
+                animation__scale="property: scale; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 2000">
+            </a-box>
+
+            <!-- Animated Avatar -->
+            <a-entity id="avatar"
+                position="1 0.5 0"
+                scale="0.5 0.5 0.5"
+                animation__float="property: position; to: 1 1 0; dir: alternate; loop: true; dur: 2000">
+                <a-sphere position="0 0.5 0" radius="0.3" color="#f59e0b"></a-sphere>
+                <a-cylinder position="0 0 0" radius="0.2" height="0.8" color="#4f46e5"></a-cylinder>
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        let timerInterval;
+        let startTime;
+
+        // Initialize recording capabilities
+        async function initRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `ar_recording_${new Date().toISOString()}.webm`;
+                    link.click();
+                    recordedChunks = [];
+                    showNotification('Recording saved!', 'success');
+                };
+
+                showNotification('Camera access granted', 'success');
+            } catch (err) {
+                showNotification('Camera access denied', 'error');
+                console.error('Error accessing camera:', err);
+            }
+        }
+
+        // Toggle recording
+        function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const statusDot = document.querySelector('.status-dot');
+
+            if (!isRecording) {
+                mediaRecorder.start();
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordBtn.innerHTML = `
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="6" width="8" height="8"/>
+                    </svg>
+                    Stop Recording
+                `;
+                statusDot.classList.add('recording');
+                startTimer();
+                showNotification('Recording started', 'info');
+
+                // Auto-stop after 30 seconds
+                setTimeout(() => {
+                    if (isRecording) toggleRecording();
+                }, 30000);
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                recordBtn.innerHTML = `
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="10" cy="10" r="6"/>
+                    </svg>
+                    Start Recording
+                `;
+                statusDot.classList.remove('recording');
+                stopTimer();
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.querySelector('.timer').textContent = '00:00';
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.querySelector('.timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        // Capture photo
+        function capturePhoto() {
+            const canvas = document.querySelector('canvas');
+            const link = document.createElement('a');
+            link.download = `ar_photo_${new Date().toISOString()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showNotification('Photo captured!', 'success');
+        }
+
+        // Object control functions
+        function updateRotationSpeed(speed) {
+            const cube = document.getElementById('arCube');
+            cube.setAttribute('animation__rotate', `property: rotation; to: 0 360 0; loop: true; dur: ${6000 - speed * 500}`);
+            showNotification('Rotation speed updated', 'info');
+        }
+
+        function updateObjectColor(color) {
+            const cube = document.getElementById('arCube');
+            cube.setAttribute('material', `color: ${color}; opacity: 0.8`);
+            showNotification('Color updated', 'info');
+        }
+
+        function updateObjectScale(scale) {
+            const cube = document.getElementById('arCube');
+            cube.setAttribute('scale', `${scale} ${scale} ${scale}`);
+            showNotification('Scale updated', 'info');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show';
+            notification.style.background = type === 'success' ? 'var(--success)' : 
+                                         type === 'error' ? 'var(--danger)' : 
+                                         'var(--bg-dark)';
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Marker detection events
+        const marker = document.getElementById('marker');
+        marker.addEventListener('markerFound', () => {
+            showNotification('Marker detected', 'success');
+        });
+
+        marker.addEventListener('markerLost', () => {
+            showNotification('Marker lost', 'warning');
+        });
+
+        // Initialize
+        window.onload = () => {
+            initRecording();
+            showNotification('AR system initialized', 'info');
+        };
+    </script>
+</body>
+</html>

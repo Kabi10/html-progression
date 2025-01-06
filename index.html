@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Learning Journey</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f4f8;
+            color: #1a202c;
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .lessons {
+            display: grid;
+            gap: 20px;
+        }
+        .lesson-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .lesson-card h2 {
+            margin: 0 0 10px 0;
+            color: #4a5568;
+        }
+        .lesson-card p {
+            margin: 0;
+            color: #718096;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .difficulty {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+        .basic { background: #9ae6b4; color: #22543d; }
+        .intermediate { background: #fbd38d; color: #744210; }
+        .advanced { background: #fc8181; color: #742a2a; }
+    </style>
+</head>
+<body>
+    <h1>HTML Learning Journey</h1>
+    <div class="lessons">
+        <a href="html-lessons/01-basic.html">
+            <div class="lesson-card">
+                <h2>Level 1: HTML Basics</h2>
+                <p>Introduction to HTML structure and basic elements</p>
+                <span class="difficulty basic">Basic</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/02-style.html">
+            <div class="lesson-card">
+                <h2>Level 2: Styling</h2>
+                <p>CSS styling and basic interactivity</p>
+                <span class="difficulty basic">Basic</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/03-advanced.html">
+            <div class="lesson-card">
+                <h2>Level 3: Advanced Styling</h2>
+                <p>Advanced CSS and Bootstrap integration</p>
+                <span class="difficulty intermediate">Intermediate</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/04-forms.html">
+            <div class="lesson-card">
+                <h2>Level 4: Forms</h2>
+                <p>Form handling and validation</p>
+                <span class="difficulty intermediate">Intermediate</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/05-anim.html">
+            <div class="lesson-card">
+                <h2>Level 5: Animations</h2>
+                <p>CSS animations and transitions</p>
+                <span class="difficulty intermediate">Intermediate</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/06-responsive.html">
+            <div class="lesson-card">
+                <h2>Level 6: Responsive Design</h2>
+                <p>Responsive layouts and media queries</p>
+                <span class="difficulty advanced">Advanced</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/07-dashboard.html">
+            <div class="lesson-card">
+                <h2>Level 7: Dashboard</h2>
+                <p>Interactive dashboard with charts</p>
+                <span class="difficulty advanced">Advanced</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/08-ar.html">
+            <div class="lesson-card">
+                <h2>Level 8: AR Experience</h2>
+                <p>Augmented Reality with A-Frame</p>
+                <span class="difficulty advanced">Advanced</span>
+            </div>
+        </a>
+        
+        <a href="html-lessons/09-3d.html">
+            <div class="lesson-card">
+                <h2>Level 9: 3D Dashboard</h2>
+                <p>Advanced 3D graphics with Three.js</p>
+                <span class="difficulty advanced">Advanced</span>
+            </div>
+        </a>
+    </div>
+</body>
+</html> 

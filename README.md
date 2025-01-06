@@ -1,44 +1,85 @@
-# HTML Learning Progression
+# HTML Learning Journey
 
-This repository demonstrates the progressive exploration of HTML capabilities, from basic structures to advanced features including Augmented Reality.
+A progressive series of HTML lessons, from basics to advanced 3D graphics.
 
-## Lessons Structure
+## Lessons Overview
 
-All lessons are organized in the `html-lessons` directory, with progressive complexity:
+1. **Level 1: HTML Basics**
+   - Basic HTML structure
+   - Essential elements
+   - Text formatting
 
-1. **lesson-01-basic-structure.html**: Basic HTML elements and structure
-2. **lesson-02-styling-and-interactivity.html**: CSS styling and simple JavaScript
-3. **lesson-03-advanced-styling.html**: Advanced styling techniques
-4. **lesson-04-forms-and-validation.html**: Form handling and validation
-5. **lesson-05-animations.html**: CSS animations and transitions
-6. **lesson-06-responsive-layout.html**: Responsive design principles
-7. **lesson-07-advanced-dashboard.html**: Complex dashboard implementation
-8. **lesson-09-advanced-features.html**: Advanced HTML5 features and APIs
+2. **Level 2: Styling**
+   - CSS introduction
+   - Basic styling
+   - Simple interactivity
 
-## Features Progression
+3. **Level 3: Advanced Styling**
+   - Complex CSS
+   - Bootstrap integration
+   - Responsive design basics
 
-Each lesson builds upon the previous ones, introducing new concepts:
+4. **Level 4: Forms**
+   - Form elements
+   - Input validation
+   - User interaction
 
-1. Basic HTML structure and semantic elements
-2. CSS styling, animations, and basic JavaScript interactions
-3. Advanced styling techniques and layouts
-4. Form handling, validation, and user input
-5. Complex animations and transitions
-6. Responsive design and mobile-first approach
-7. Dashboard layout and component organization
-8. Advanced HTML5 APIs and features
+5. **Level 5: Animations**
+   - CSS animations
+   - Transitions
+   - Visual effects
 
-## Getting Started
+6. **Level 6: Responsive Design**
+   - Media queries
+   - Flexible layouts
+   - Mobile-first approach
 
-1. Clone this repository
-2. Navigate to the `html-lessons` directory
-3. Open any lesson file in a modern web browser
-4. Study the code and comments to understand the concepts
-5. Try modifying the code to experiment with features
+7. **Level 7: Dashboard**
+   - Interactive elements
+   - Data visualization
+   - Real-time updates
 
-## Learning Path
+8. **Level 8: AR Experience**
+   - Augmented Reality
+   - A-Frame framework
+   - 3D elements
 
-- Start with lesson-01 and progress sequentially
-- Each lesson includes comments explaining new concepts
-- Experiment with the code to reinforce learning
-- Try combining features from different lessons 
+9. **Level 9: 3D Dashboard**
+   - Three.js integration
+   - Advanced 3D graphics
+   - Performance monitoring
+   - Interactive controls
+
+## How to Use
+
+1. Visit the [live demo](https://kabi10.github.io/html-progression)
+2. Click on any lesson card to view the example
+3. Each lesson builds upon previous concepts
+4. Source code available in the `html-lessons` directory
+
+## Technologies Used
+
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap
+- A-Frame
+- Three.js
+- Chart.js
+
+## Local Development
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Kabi10/html-progression.git
+   ```
+
+2. Open the project in your favorite code editor
+
+3. Start a local server (e.g., using Live Server in VS Code)
+
+4. Open `index.html` to view the lesson menu
+
+## Contributing
+
+Feel free to submit issues and enhancement requests! 

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 5: Advanced Animations</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --text-dark: #1e293b;
+            
+            --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            --ease-smooth: cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: var(--bg-dark);
+                --text: var(--text-light);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            transition: background-color 0.5s var(--ease-smooth);
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            padding: 2rem;
+        }
+
+        /* Hero Section with SVG Animation */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.8s var(--ease-elastic) forwards;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.8s var(--ease-elastic) 0.2s forwards;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .wave {
+            animation: wave 20s linear infinite;
+            fill: var(--primary);
+            opacity: 0.1;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: -5s;
+            fill: var(--secondary);
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: -10s;
+            fill: var(--accent);
+        }
+
+        /* Interactive Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s var(--ease-elastic);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s var(--ease-smooth);
+        }
+
+        .card:hover::before {
+            opacity: 0.1;
+        }
+
+        /* Animated Icons */
+        .icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawPath 2s var(--ease-smooth) forwards;
+        }
+
+        /* Loading Animation */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0) translateY(0) rotate(0); }
+            100% { transform: translateX(-50%) translateY(0) rotate(360deg); }
+        }
+
+        @keyframes drawPath {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: currentColor;
+            transition: transform 0.3s var(--ease-elastic);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Price Ticker */
+        .price-ticker {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            transform: translateY(100%);
+            animation: slideUp 0.5s var(--ease-smooth) 1s forwards;
+        }
+
+        .ticker-content {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-change.up {
+            color: var(--secondary);
+        }
+
+        .price-change.down {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24">
+            <path class="sun" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+    </button>
+
+    <!-- Hero Section -->
+    <div class="container">
+        <div class="hero">
+            <div class="animated-bg">
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path class="wave" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    <path class="wave" d="M0,96L48,112C96,128,192,160,288,181.3C384,203,480,213,576,202.7C672,192,768,160,864,170.7C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    <path class="wave" d="M0,64L48,85.3C96,107,192,149,288,144C384,139,480,85,576,80C672,75,768,117,864,133.3C960,149,1056,139,1152,133.3C1248,128,1344,128,1392,128L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+            <h1>Advanced Animations</h1>
+            <p>Explore beautiful animations and real-time updates with WebSocket integration.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Card 1: SVG Animation -->
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <h3>SVG Animations</h3>
+                <p>Smooth path animations with SVG strokes.</p>
+            </div>
+
+            <!-- Card 2: WebSocket Updates -->
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                </div>
+                <h3>Real-time Updates</h3>
+                <p>Live cryptocurrency price updates via WebSocket.</p>
+            </div>
+
+            <!-- Card 3: Interactive Elements -->
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M13 12H3"></path>
+                    </svg>
+                </div>
+                <h3>Interactive UI</h3>
+                <p>Responsive animations and smooth transitions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Ticker -->
+    <div class="price-ticker">
+        <div class="ticker-content">
+            <div class="ticker-item">
+                <span>BTC</span>
+                <span id="btcPrice">Loading...</span>
+                <span id="btcChange" class="price-change">0%</span>
+            </div>
+            <div class="ticker-item">
+                <span>ETH</span>
+                <span id="ethPrice">Loading...</span>
+                <span id="ethChange" class="price-change">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const toggleDarkMode = () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        };
+
+        // Load saved theme
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // WebSocket Connection
+        const connectWebSocket = () => {
+            const ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum');
+            const btcPrice = document.getElementById('btcPrice');
+            const ethPrice = document.getElementById('ethPrice');
+            const btcChange = document.getElementById('btcChange');
+            const ethChange = document.getElementById('ethChange');
+
+            let lastBtcPrice = 0;
+            let lastEthPrice = 0;
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.bitcoin) {
+                    const price = parseFloat(data.bitcoin);
+                    const change = lastBtcPrice ? ((price - lastBtcPrice) / lastBtcPrice) * 100 : 0;
+                    btcPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                    btcChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                    btcChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
+                    lastBtcPrice = price;
+                }
+                
+                if (data.ethereum) {
+                    const price = parseFloat(data.ethereum);
+                    const change = lastEthPrice ? ((price - lastEthPrice) / lastEthPrice) * 100 : 0;
+                    ethPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                    ethChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                    ethChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
+                    lastEthPrice = price;
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection closed. Reconnecting...');
+                setTimeout(connectWebSocket, 5000);
+            };
+        };
+
+        // Initialize WebSocket
+        connectWebSocket();
+
+        // Add scroll-triggered animations
+        const observeElements = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                observer.observe(card);
+            });
+        };
+
+        // Initialize animations
+        observeElements();
+    </script>
+</body>
+</html>

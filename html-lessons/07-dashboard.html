@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 7: Advanced Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+    <style>
+        :root {
+            /* Theme Colors */
+            --theme-hue: 230;
+            --theme-saturation: 95%;
+            --theme-lightness: 65%;
+            
+            /* Dynamic Colors */
+            --primary: hsl(var(--theme-hue), var(--theme-saturation), var(--theme-lightness));
+            --primary-dark: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) - 10%));
+            --primary-light: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) + 10%));
+            
+            /* Accent Colors */
+            --success: hsl(142, 76%, 36%);
+            --warning: hsl(38, 92%, 50%);
+            --danger: hsl(0, 84%, 60%);
+            --info: hsl(214, 100%, 48%);
+            
+            /* Background Colors */
+            --bg-dark: hsl(222, 47%, 11%);
+            --bg-card: hsla(217, 33%, 17%, 0.7);
+            --border-color: hsla(215, 20%, 65%, 0.1);
+            
+            /* Text Colors */
+            --text-primary: hsl(214, 32%, 91%);
+            --text-secondary: hsl(215, 20%, 65%);
+            
+            /* Animations */
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            
+            /* 3D Properties */
+            --perspective: 1000px;
+            --rotation-x: 0deg;
+            --rotation-y: 0deg;
+        }
+
+        @property --theme-hue {
+            syntax: '<number>';
+            initial-value: 230;
+            inherits: true;
+        }
+
+        @property --rotation-x {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: true;
+        }
+
+        @property --rotation-y {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: true;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow: hidden;
+            height: 100vh;
+            perspective: var(--perspective);
+        }
+
+        /* 3D Scene Container */
+        #scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Main Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            height: 100vh;
+            transform-style: preserve-3d;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .main {
+            padding: 1.5rem;
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+            height: 100vh;
+            margin-left: 200px;
+            margin-right: 300px;
+            overflow: hidden;
+        }
+
+        /* Analysis Tools */
+        .analysis-tools {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 200px;
+            background: var(--bg-card);
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow-y: auto;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            font-size: 0.875rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .tool-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Theme Controls */
+        .theme-controls {
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 300px;
+            background: var(--bg-card);
+            padding: 1.25rem;
+            backdrop-filter: blur(10px);
+            border-left: 1px solid var(--border-color);
+            transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow-y: auto;
+        }
+
+        .theme-controls h4 {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .theme-controls label {
+            display: block;
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .theme-controls input {
+            width: 100%;
+            margin-bottom: 1rem;
+            accent-color: var(--primary);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            height: calc((100vh - 4rem) / 2);
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            transition: all 0.6s var(--transition-bounce);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: 
+                translateZ(20px)
+                rotateX(var(--rotation-x))
+                rotateY(var(--rotation-y));
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.3),
+                0 0 30px rgba(var(--primary-rgb), 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(
+                45deg,
+                var(--primary),
+                var(--primary-light)
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Voice Command Button */
+        .voice-cmd {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.3s var(--transition-bounce);
+        }
+
+        .voice-cmd:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        .voice-cmd.listening {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(var(--primary-rgb), 0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .main {
+                margin-right: 60px;
+                margin-left: 60px;
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .card {
+                height: calc((100vh - 3rem) / 2);
+            }
+
+            .tool-btn {
+                padding: 0.625rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                margin: 0;
+                padding: 0.75rem;
+                gap: 0.75rem;
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                height: calc((100vh - 2rem) / 4);
+            }
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Prediction Content */
+        #prediction-content {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+
+        .prediction-symbol {
+            font-weight: 600;
+        }
+
+        .prediction-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prediction-value.up { color: var(--success); }
+        .prediction-value.down { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <!-- 3D Background Scene -->
+    <div id="scene-container"></div>
+
+    <div class="dashboard">
+        <main class="main">
+            <!-- Real-time Data Cards -->
+            <div class="card" id="market-overview">
+                <div class="card-header">
+                    <h3 class="card-title">Market Overview</h3>
+                </div>
+                <canvas id="market-chart"></canvas>
+    </div>
+
+            <div class="card" id="sentiment-analysis">
+                <div class="card-header">
+                    <h3 class="card-title">Market Sentiment</h3>
+                </div>
+                <canvas id="sentiment-chart"></canvas>
+        </div>
+
+            <div class="card" id="volume-analysis">
+                <div class="card-header">
+                    <h3 class="card-title">Trading Volume</h3>
+                </div>
+                <canvas id="volume-chart"></canvas>
+        </div>
+
+            <div class="card" id="predictions">
+                <div class="card-header">
+                    <h3 class="card-title">AI Predictions</h3>
+                </div>
+                <div id="prediction-content"></div>
+        </div>
+        </main>
+    </div>
+
+    <!-- Theme Controls -->
+    <div class="theme-controls">
+        <h4>Theme Customization</h4>
+        <label>Hue</label>
+        <input type="range" id="hue" min="0" max="360" value="230">
+        <label>Saturation</label>
+        <input type="range" id="saturation" min="0" max="100" value="95">
+        <label>Lightness</label>
+        <input type="range" id="lightness" min="0" max="100" value="65">
+    </div>
+
+    <!-- Analysis Tools -->
+    <div class="analysis-tools">
+        <button class="tool-btn" onclick="toggleTrendlines()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 11l2-2 8 8M7 11l2-2 8 8M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Toggle Trendlines</span>
+        </button>
+        <button class="tool-btn" onclick="toggleVolume()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Toggle Volume</span>
+        </button>
+        <button class="tool-btn" onclick="togglePredictions()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Toggle Predictions</span>
+        </button>
+    </div>
+
+    <!-- Voice Command Button -->
+    <button class="voice-cmd" onclick="toggleVoiceCommand()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <script>
+        // Initialize 3D Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('scene-container').appendChild(renderer.domElement);
+
+        // Create animated background particles
+        const particles = new THREE.Group();
+        const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+        const particleMaterial = new THREE.MeshBasicMaterial({ color: 0x6366f1 });
+
+        for(let i = 0; i < 100; i++) {
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+            particle.position.set(
+                (Math.random() - 0.5) * 50,
+                (Math.random() - 0.5) * 50,
+                (Math.random() - 0.5) * 50
+            );
+            particle.userData = {
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02
+                )
+            };
+            particles.add(particle);
+        }
+
+        scene.add(particles);
+        camera.position.z = 30;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particles.children.forEach(particle => {
+                particle.position.add(particle.userData.velocity);
+
+                if(Math.abs(particle.position.x) > 25) particle.userData.velocity.x *= -1;
+                if(Math.abs(particle.position.y) > 25) particle.userData.velocity.y *= -1;
+                if(Math.abs(particle.position.z) > 25) particle.userData.velocity.z *= -1;
+            });
+
+            particles.rotation.x += 0.001;
+            particles.rotation.y += 0.002;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Theme Customization
+        const themeControls = {
+            hue: document.getElementById('hue'),
+            saturation: document.getElementById('saturation'),
+            lightness: document.getElementById('lightness')
+        };
+
+        function updateTheme() {
+            document.documentElement.style.setProperty('--theme-hue', themeControls.hue.value);
+            document.documentElement.style.setProperty('--theme-saturation', `${themeControls.saturation.value}%`);
+            document.documentElement.style.setProperty('--theme-lightness', `${themeControls.lightness.value}%`);
+        }
+
+        Object.values(themeControls).forEach(control => {
+            control.addEventListener('input', updateTheme);
+        });
+
+        // 3D Card Effect
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const rotateY = ((x / rect.width) - 0.5) * 20;
+                const rotateX = ((y / rect.height) - 0.5) * -20;
+
+                card.style.setProperty('--rotation-y', `${rotateY}deg`);
+                card.style.setProperty('--rotation-x', `${rotateX}deg`);
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.setProperty('--rotation-y', '0deg');
+                card.style.setProperty('--rotation-x', '0deg');
+            });
+        });
+
+        // Voice Commands
+        let recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = event => {
+                const command = event.results[0][0].transcript.toLowerCase();
+                processVoiceCommand(command);
+            };
+        }
+
+        function toggleVoiceCommand() {
+            const btn = document.querySelector('.voice-cmd');
+            if (recognition) {
+                btn.classList.toggle('listening');
+                if (btn.classList.contains('listening')) {
+                    recognition.start();
+                    speak("Listening for commands");
+                } else {
+                    recognition.stop();
+                }
+            }
+        }
+
+        function processVoiceCommand(command) {
+            if (command.includes('theme')) {
+                if (command.includes('dark')) {
+                    themeControls.lightness.value = 30;
+                } else if (command.includes('light')) {
+                    themeControls.lightness.value = 65;
+                }
+                updateTheme();
+            }
+            // Add more voice commands here
+        }
+
+        // Speech Synthesis
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Initialize charts
+        const charts = {
+            market: new Chart(document.getElementById('market-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                    labels: Array(24).fill(0).map((_, i) => new Date(Date.now() - (23 - i) * 3600000)),
+                    datasets: [{
+                        label: 'Market Price',
+                        data: Array(24).fill(0).map(() => Math.random() * 100 + 200),
+                        borderColor: 'var(--primary)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'hour' },
+                            grid: { display: false },
+                            ticks: { color: 'var(--text-secondary)' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-secondary)' }
+                        }
+                    }
+                }
+            }),
+            sentiment: new Chart(document.getElementById('sentiment-chart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    datasets: [{
+                        data: [60, 25, 15],
+                        backgroundColor: [
+                            'var(--success)',
+                            'var(--warning)',
+                            'var(--danger)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'var(--text-secondary)' }
+                        }
+                    }
+                }
+            }),
+            volume: new Chart(document.getElementById('volume-chart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Array(12).fill(0).map((_, i) => new Date(Date.now() - (11 - i) * 3600000)),
+                datasets: [{
+                        label: 'Volume',
+                        data: Array(12).fill(0).map(() => Math.random() * 1000000),
+                        backgroundColor: 'var(--primary)',
+                        borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'hour' },
+                            grid: { display: false },
+                            ticks: { color: 'var(--text-secondary)' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'var(--text-secondary)' }
+                        }
+                    }
+                }
+            })
+        };
+
+        // Mock data for predictions
+        const predictions = [
+            { symbol: 'BTC/USD', prediction: 'up', value: '+2.5%', confidence: 0.85 },
+            { symbol: 'ETH/USD', prediction: 'up', value: '+1.8%', confidence: 0.75 },
+            { symbol: 'XRP/USD', prediction: 'down', value: '-0.5%', confidence: 0.65 }
+        ];
+
+        // Populate predictions
+        document.getElementById('prediction-content').innerHTML = predictions.map(p => `
+            <div class="prediction-item">
+                <span class="prediction-symbol">${p.symbol}</span>
+                <div class="prediction-value ${p.prediction}">
+                    <span>${p.value}</span>
+                    <small>(${(p.confidence * 100).toFixed(0)}% confidence)</small>
+                </div>
+            </div>
+        `).join('');
+
+        // WebSocket Connection (Mock)
+        const mockWebSocket = {
+            data: {
+                market: charts.market.data.datasets[0].data,
+                sentiment: charts.sentiment.data.datasets[0].data,
+                volume: charts.volume.data.datasets[0].data
+            },
+            
+            connect() {
+                setInterval(() => {
+                    // Update market data
+                    this.data.market.push(this.data.market[this.data.market.length - 1] * (1 + (Math.random() - 0.5) * 0.02));
+                    this.data.market.shift();
+                    charts.market.data.datasets[0].data = this.data.market;
+                    
+                    // Update volume data
+                    this.data.volume.push(Math.random() * 1000000);
+                    this.data.volume.shift();
+                    charts.volume.data.datasets[0].data = this.data.volume;
+                    
+                    // Update sentiment occasionally
+                    if (Math.random() < 0.1) {
+                        this.data.sentiment = this.data.sentiment.map(v => 
+                            Math.max(0, Math.min(100, v + (Math.random() - 0.5) * 10))
+                        );
+                        charts.sentiment.data.datasets[0].data = this.data.sentiment;
+                    }
+                    
+                    // Update all charts
+                    Object.values(charts).forEach(chart => chart.update());
+                }, 1000);
+            }
+        };
+
+        mockWebSocket.connect();
+
+        // Analysis Tools Implementation
+        let trendlinesVisible = false;
+        let volumeVisible = true;
+        let predictionsVisible = true;
+
+        function toggleTrendlines() {
+            trendlinesVisible = !trendlinesVisible;
+            
+            // Add or remove trendline dataset
+            const trendlineData = calculateTrendline(charts.market.data.datasets[0].data);
+            if (trendlinesVisible) {
+                charts.market.data.datasets.push({
+                    label: 'Trendline',
+                    data: trendlineData,
+                    borderColor: 'var(--warning)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0
+                });
+            } else {
+                charts.market.data.datasets = charts.market.data.datasets.slice(0, 1);
+            }
+            
+            charts.market.update();
+        }
+
+        function calculateTrendline(data) {
+            const n = data.length;
+            let sumX = 0;
+            let sumY = 0;
+            let sumXY = 0;
+            let sumXX = 0;
+            
+            data.forEach((y, x) => {
+                sumX += x;
+                sumY += y;
+                sumXY += x * y;
+                sumXX += x * x;
+            });
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            return data.map((_, i) => slope * i + intercept);
+        }
+
+        function toggleVolume() {
+            volumeVisible = !volumeVisible;
+            document.getElementById('volume-analysis').style.display = volumeVisible ? 'block' : 'none';
+        }
+
+        function togglePredictions() {
+            predictionsVisible = !predictionsVisible;
+            document.getElementById('predictions').style.display = predictionsVisible ? 'block' : 'none';
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
