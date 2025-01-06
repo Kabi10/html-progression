@@ -1,35 +1,44 @@
-# HTML Learning Progression & AR Demo
+# HTML Learning Progression
 
 This repository demonstrates the progressive exploration of HTML capabilities, from basic structures to advanced features including Augmented Reality.
 
-## Project Structure
+## Lessons Structure
 
-- `src/levels/` - Progressive HTML examples showing increasing complexity
-  - Level 1: Basic HTML structure
-  - Level 2: CSS styling and basic interactivity
-  - Level 3-7: Advanced features and layouts
-- `ar-demo/` - Augmented Reality demonstration with auto-recording capability
+All lessons are organized in the `html-lessons` directory, with progressive complexity:
 
-## Features by Level
+1. **lesson-01-basic-structure.html**: Basic HTML elements and structure
+2. **lesson-02-styling-and-interactivity.html**: CSS styling and simple JavaScript
+3. **lesson-03-advanced-styling.html**: Advanced styling techniques
+4. **lesson-04-forms-and-validation.html**: Form handling and validation
+5. **lesson-05-animations.html**: CSS animations and transitions
+6. **lesson-06-responsive-layout.html**: Responsive design principles
+7. **lesson-07-advanced-dashboard.html**: Complex dashboard implementation
+8. **lesson-09-advanced-features.html**: Advanced HTML5 features and APIs
 
-1. **Level 1**: Basic HTML structure and elements
-2. **Level 2**: CSS styling, animations, and simple JavaScript
-3. **Level 3**: Advanced styling and more complex interactions
-4. **Level 4**: Form handling and validation
-5. **Level 5**: Advanced animations and transitions
-6. **Level 6**: Responsive design and modern layouts
-7. **Level 7**: Complex dashboard with advanced UI components
+## Features Progression
 
-## AR Demo Features
+Each lesson builds upon the previous ones, introducing new concepts:
 
-- Marker-based AR using AR.js
-- 3D object rendering and animation
-- Automatic video recording capability
-- Interactive avatar implementation
+1. Basic HTML structure and semantic elements
+2. CSS styling, animations, and basic JavaScript interactions
+3. Advanced styling techniques and layouts
+4. Form handling, validation, and user input
+5. Complex animations and transitions
+6. Responsive design and mobile-first approach
+7. Dashboard layout and component organization
+8. Advanced HTML5 APIs and features
 
 ## Getting Started
 
 1. Clone this repository
-2. Open any HTML file in a modern web browser
-3. For AR demo, ensure camera permissions are granted
-4. Use a Hiro marker for AR features 
+2. Navigate to the `html-lessons` directory
+3. Open any lesson file in a modern web browser
+4. Study the code and comments to understand the concepts
+5. Try modifying the code to experiment with features
+
+## Learning Path
+
+- Start with lesson-01 and progress sequentially
+- Each lesson includes comments explaining new concepts
+- Experiment with the code to reinforce learning
+- Try combining features from different lessons 
