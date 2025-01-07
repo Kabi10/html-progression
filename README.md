@@ -1,85 +1,93 @@
-# HTML Learning Journey
+# HTML Learning Journey 🚀
 
-A progressive series of HTML lessons, from basics to advanced 3D graphics.
+An interactive web-based learning platform for mastering HTML, CSS, and advanced web technologies. Progress from basic HTML concepts to creating stunning 3D web applications.
 
-## Lessons Overview
+## Features ✨
 
-1. **Level 1: HTML Basics**
-   - Basic HTML structure
-   - Essential elements
-   - Text formatting
+- 📚 10 Progressive Lessons
+- 🎨 Interactive UI with Dark/Light Theme
+- 📱 Mobile Responsive Design
+- ⌨️ Keyboard Shortcuts
+- 🔍 Search Functionality
+- 📊 Progress Tracking
+- 🎯 Real-time Performance Monitoring
 
-2. **Level 2: Styling**
-   - CSS introduction
-   - Basic styling
-   - Simple interactivity
+## Lesson Structure 📖
 
-3. **Level 3: Advanced Styling**
-   - Complex CSS
-   - Bootstrap integration
-   - Responsive design basics
+1. **HTML Basics** - Fundamentals of HTML structure
+2. **CSS Styling** - Introduction to CSS
+3. **Advanced Styling** - Complex CSS and Bootstrap
+4. **Animations** - Basic CSS animations
+5. **Advanced Animations** - Complex animations and effects
+6. **Responsive Design** - Mobile-first approach
+7. **Interactive Dashboard** - Dynamic content and real-time updates
+8. **Augmented Reality** - AR with A-Frame
+9. **3D Features** - Three.js 3D graphics
+10. **Capstone Portfolio** - Full-stack portfolio project
 
-4. **Level 4: Forms**
-   - Form elements
-   - Input validation
-   - User interaction
-
-5. **Level 5: Animations**
-   - CSS animations
-   - Transitions
-   - Visual effects
-
-6. **Level 6: Responsive Design**
-   - Media queries
-   - Flexible layouts
-   - Mobile-first approach
-
-7. **Level 7: Dashboard**
-   - Interactive elements
-   - Data visualization
-   - Real-time updates
-
-8. **Level 8: AR Experience**
-   - Augmented Reality
-   - A-Frame framework
-   - 3D elements
-
-9. **Level 9: 3D Dashboard**
-   - Three.js integration
-   - Advanced 3D graphics
-   - Performance monitoring
-   - Interactive controls
-
-## How to Use
-
-1. Visit the [live demo](https://kabi10.github.io/html-progression)
-2. Click on any lesson card to view the example
-3. Each lesson builds upon previous concepts
-4. Source code available in the `html-lessons` directory
-
-## Technologies Used
+## Technologies Used 🛠️
 
 - HTML5
 - CSS3
 - JavaScript
-- Bootstrap
-- A-Frame
+- Bootstrap 5
 - Three.js
+- A-Frame
 - Chart.js
 
-## Local Development
+## Getting Started 🌟
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Kabi10/html-progression.git
+   git clone https://github.com/your-username/html-progression.git
    ```
 
-2. Open the project in your favorite code editor
+2. Open `index.html` in your browser
 
-3. Start a local server (e.g., using Live Server in VS Code)
+3. Start with Lesson 1 and progress through each level
 
-4. Open `index.html` to view the lesson menu
+## Keyboard Shortcuts ⌨️
 
-## Contributing
+- `Alt + 1-9` - Jump to specific lessons
+- `Alt + 0` - Jump to Capstone Project
+- `Alt + M` - Return to main menu
+- `Alt + T` - Toggle theme
+- `/` - Focus search bar
 
-Feel free to submit issues and enhancement requests! 
+## Mobile Features 📱
+
+- Touch-friendly controls
+- Responsive layout
+- Double-tap selection
+- Pinch-to-zoom in 3D lessons
+- Mobile-optimized UI elements
+
+## Performance 🚀
+
+- Real-time FPS monitoring
+- Performance statistics
+- Optimized 3D rendering
+- Efficient resource loading
+- Progressive enhancement
+
+## Contributing 🤝
+
+Feel free to submit issues and enhancement requests!
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License 📄
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments 💖
+
+Created with ❤️ by Kabi
+
+---
+
+Happy Learning! 🎉 
