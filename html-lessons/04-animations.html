@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Advanced CSS animations and effects">
+    <meta name="theme-color" content="#4f46e5">
     <title>Advanced Effects - Level 4</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     <style>
-        /* Keep existing CSS Variables */
         :root {
             --primary: #4f46e5;
             --primary-dark: #4338ca;
@@ -16,13 +16,14 @@
             --surface-2: #f9fafb;
             --text-1: #111827;
             --text-2: #4b5563;
+            --base-font-size: clamp(16px, 2vw, 18px);
+            --heading-font-size: clamp(24px, 3vw, 32px);
             
             --gradient-1: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
             --gradient-2: linear-gradient(45deg, #4f46e5 0%, #0ea5e9 100%);
             --gradient-3: linear-gradient(to right, #22c55e 0%, #10b981 100%);
         }
 
-        /* Keep Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
                 --surface-1: #1f2937;
@@ -32,12 +33,12 @@
             }
         }
 
-        /* Base Styles with Mobile-First Approach */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            touch-action: manipulation; /* Improve touch response */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -49,11 +50,10 @@
             display: grid;
             place-items: center;
             overflow-x: hidden;
-            padding: 1rem; /* Add padding for mobile */
-            font-size: 16px; /* Base font size for readability */
+            padding: clamp(1rem, 5vw, 2rem);
+            font-size: var(--base-font-size);
         }
 
-        /* Responsive Grid Layout */
         .bg-grid {
             position: fixed;
             top: 0;
@@ -61,13 +61,20 @@
             right: 0;
             bottom: 0;
             background-image: 
-                linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px; /* Smaller grid for mobile */
+                linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+            background-size: clamp(10px, 3vw, 20px) clamp(10px, 3vw, 20px);
             z-index: -1;
             transform: perspective(500px) rotateX(60deg);
             transform-origin: top;
             animation: grid-move 20s linear infinite;
+            will-change: background-position;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bg-grid {
+                animation: none;
+            }
         }
 
         @keyframes grid-move {
@@ -75,77 +82,74 @@
             to { background-position: 0 40px; }
         }
 
-        /* Responsive Floating Elements */
         .floating-shapes {
             position: fixed;
             inset: 0;
             pointer-events: none;
             z-index: -1;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .floating-shapes {
+                opacity: 0.3;
+            }
         }
 
         .shape {
             position: absolute;
             border-radius: 50%;
-            filter: blur(20px); /* Reduced blur for better mobile performance */
+            filter: blur(clamp(10px, 2vw, 20px));
             opacity: 0.4;
             animation: float 20s infinite;
+            will-change: transform;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .shape {
+                animation: none;
+            }
         }
 
         .shape:nth-child(1) {
-            width: 400px;
-            height: 400px;
+            width: min(400px, 50vw);
+            height: min(400px, 50vw);
             background: var(--gradient-1);
             top: -200px;
             left: -200px;
         }
 
         .shape:nth-child(2) {
-            width: 300px;
-            height: 300px;
+            width: min(300px, 40vw);
+            height: min(300px, 40vw);
             background: var(--gradient-2);
             bottom: -150px;
             right: -150px;
             animation-delay: -7s;
         }
 
-        /* Media Queries */
-        @media (min-width: 768px) {
-            .bg-grid {
-                background-size: 40px 40px;
-            }
-
-            .shape {
-                filter: blur(40px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .floating-shapes {
-                display: none; /* Hide complex animations on small devices */
-            }
-        }
-
-        /* Main Content */
         .container {
-            width: 90%;
-            max-width: 1200px;
+            width: min(90%, 1200px);
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+            padding: clamp(1rem, 3vw, 2rem);
+            margin: 0 auto;
         }
 
-        /* Interactive Cards */
         .card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 2rem;
+            padding: clamp(1.5rem, 4vw, 2rem);
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .card::before {
@@ -157,45 +161,52 @@
             transition: opacity 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-10px);
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-10px);
+            }
+
+            .card:hover::before {
+                opacity: 0.1;
+            }
         }
 
-        .card:hover::before {
-            opacity: 0.1;
+        .card:active {
+            transform: scale(0.98);
         }
 
-        /* Card Content */
         .card-content {
             position: relative;
             z-index: 1;
         }
 
         .card h2 {
-            font-size: 1.5rem;
+            font-size: var(--heading-font-size);
             margin-bottom: 1rem;
             background: var(--gradient-1);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            font-weight: 600;
         }
 
-        /* Interactive Elements */
         .interactive-element {
-            width: 100px;
-            height: 100px;
+            width: min(100px, 30vw);
+            height: min(100px, 30vw);
             margin: 2rem auto;
             background: var(--gradient-1);
             border-radius: 20px;
             transition: all 0.3s ease;
+            will-change: transform;
         }
 
-        .card:hover .interactive-element {
-            transform: rotate(45deg) scale(1.1);
-            background: var(--gradient-2);
+        @media (hover: hover) {
+            .card:hover .interactive-element {
+                transform: rotate(45deg) scale(1.1);
+                background: var(--gradient-2);
+            }
         }
 
-        /* Pulse Animation */
         .pulse {
             position: relative;
         }
@@ -207,6 +218,7 @@
             border: 2px solid var(--primary);
             border-radius: inherit;
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            will-change: transform, opacity;
         }
 
         @keyframes pulse {
@@ -214,7 +226,6 @@
             100% { transform: scale(1.5); opacity: 0; }
         }
 
-        /* Wave Effect */
         .wave {
             position: absolute;
             bottom: 0;
@@ -225,6 +236,7 @@
             opacity: 0.1;
             transform-origin: bottom;
             animation: wave 5s ease-in-out infinite;
+            will-change: transform;
         }
 
         @keyframes wave {
@@ -232,11 +244,11 @@
             50% { transform: scaleY(1.2); }
         }
 
-        /* Particle System */
         .particles {
             position: absolute;
             inset: 0;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .particle {
@@ -246,45 +258,69 @@
             background: var(--primary);
             border-radius: 50%;
             animation: particle-float 3s ease-in-out infinite;
+            will-change: transform;
         }
 
         @keyframes particle-float {
             0%, 100% { transform: translate(0, 0); }
             50% { transform: translate(10px, -10px); }
         }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, 10px); }
+            50% { transform: translate(-5px, 15px); }
+            75% { transform: translate(-10px, 5px); }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 1rem;
+            }
+
+            .interactive-element {
+                margin: 1rem auto;
+            }
+        }
+
+        /* Touch feedback */
+        @media (hover: none) {
+            .card:active::before {
+                opacity: 0.2;
+            }
+
+            .card:active .interactive-element {
+                transform: scale(0.95);
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Background Elements -->
     <div class="bg-grid"></div>
     <div class="floating-shapes">
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
 
-    <!-- Main Content -->
     <div class="container">
-        <!-- Card 1: Morphing Shapes -->
         <div class="card">
             <div class="card-content">
                 <h2>Morphing Shapes</h2>
                 <div class="interactive-element pulse"></div>
-                <p>Hover to transform the shape and trigger animations.</p>
+                <p>Tap or hover to transform the shape</p>
             </div>
         </div>
 
-        <!-- Card 2: Wave Effects -->
         <div class="card">
             <div class="card-content">
                 <h2>Wave Animation</h2>
                 <div class="interactive-element">
                     <div class="wave"></div>
                 </div>
-                <p>Dynamic wave effect with gradient colors.</p>
+                <p>Dynamic wave effect with gradient</p>
             </div>
         </div>
 
-        <!-- Card 3: Particle System -->
         <div class="card">
             <div class="card-content">
                 <h2>Particle System</h2>
@@ -295,34 +331,56 @@
                         <div class="particle" style="top: 40%; left: 70%;"></div>
                     </div>
                 </div>
-                <p>Interactive particle animations.</p>
+                <p>Interactive particle animations</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Add dynamic particles
+        // Enhanced particle system with touch support
         function createParticles() {
             const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = x + 'px';
-                    particle.style.top = y + 'px';
-                    
-                    card.appendChild(particle);
-                    
-                    setTimeout(() => particle.remove(), 1000);
+            
+            function createParticle(x, y, card) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                
+                card.appendChild(particle);
+                
+                // Use requestAnimationFrame for smooth removal
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        if (particle.parentNode === card) {
+                            card.removeChild(particle);
+                        }
+                    }, 1000);
                 });
+            }
+            
+            function handleInteraction(e) {
+                const rect = this.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                
+                createParticle(x, y, this);
+            }
+            
+            cards.forEach(card => {
+                card.addEventListener('mousemove', handleInteraction);
+                card.addEventListener('touchmove', handleInteraction, { passive: true });
             });
         }
 
-        createParticles();
+        // Initialize with performance optimization
+        requestAnimationFrame(() => {
+            createParticles();
+        });
+
+        // Add passive touch listeners for better mobile performance
+        document.addEventListener('touchstart', () => {}, { passive: true });
+        document.addEventListener('touchmove', () => {}, { passive: true });
     </script>
 </body>
 </html>

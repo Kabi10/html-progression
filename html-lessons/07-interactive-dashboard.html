@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1f2e">
     <title>Level 7: Advanced Analytics Dashboard</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -44,32 +45,28 @@
             --perspective: 1000px;
             --rotation-x: 0deg;
             --rotation-y: 0deg;
-        }
-
-        @property --theme-hue {
-            syntax: '<number>';
-            initial-value: 230;
-            inherits: true;
-        }
-
-        @property --rotation-x {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: true;
-        }
-
-        @property --rotation-y {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: true;
+            
+            /* Responsive Typography Base Sizes */
+            --font-size-base: clamp(14px, 1vw + 0.5rem, 16px);
+            --font-size-lg: clamp(16px, 1.5vw + 0.75rem, 20px);
+            --font-size-xl: clamp(20px, 2vw + 1rem, 24px);
+            
+            /* Touch Target Sizes */
+            --touch-target-size: clamp(44px, 8vw, 56px);
+            --touch-target-spacing: clamp(8px, 2vw, 12px);
+            
+            /* Card Sizes */
+            --card-min-height: clamp(200px, 30vh, 300px);
+            --card-padding: clamp(12px, 3vw, 20px);
+            --card-gap: clamp(10px, 2vw, 20px);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* Better touch feedback */
-            touch-action: manipulation; /* Optimize touch behavior */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body {
@@ -77,264 +74,132 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.5;
-            overflow-x: hidden; /* Changed from hidden to allow vertical scroll */
-            min-height: 100vh; /* Changed from height to min-height */
-            perspective: var(--perspective);
-            -webkit-text-size-adjust: 100%; /* Prevent font scaling */
+            font-size: var(--font-size-base);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 3D Scene Container */
-        #scene-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.5;
-        }
-
-        /* Main Layout */
+        /* Mobile-First Dashboard Layout */
         .dashboard {
             display: grid;
-            grid-template-columns: 1fr; /* Mobile-first: single column */
-            grid-template-rows: auto 1fr;
-            min-height: 100vh;
-            transform-style: preserve-3d;
-            animation: float 10s infinite ease-in-out;
-            padding: 1rem; /* Add padding for mobile */
+            grid-template-columns: 1fr;
+            gap: var(--card-gap);
+            padding: var(--card-padding);
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            position: relative;
         }
 
-        /* Add responsive breakpoints */
         @media (min-width: 768px) {
             .dashboard {
-                grid-template-columns: auto 1fr;
-                padding: 0;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        /* Add touch-friendly interaction styles */
-        @media (hover: none) and (pointer: coarse) {
-            /* Increase touch targets */
-            button, 
-            a {
-                min-height: 44px;
-                min-width: 44px;
-                padding: 12px;
+        @media (min-width: 1024px) {
+            .dashboard {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .main {
-            padding: 1.5rem;
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(2, 1fr);
-            height: 100vh;
-            margin-left: 200px;
-            margin-right: 300px;
-            overflow: hidden;
-        }
-
-        /* Analysis Tools */
-        .analysis-tools {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 200px;
-            background: var(--bg-card);
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            overflow-y: auto;
-        }
-
-        .tool-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s var(--transition-smooth);
-            font-size: 0.875rem;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tool-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .tool-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* Theme Controls */
-        .theme-controls {
-            position: fixed;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 300px;
-            background: var(--bg-card);
-            padding: 1.25rem;
-            backdrop-filter: blur(10px);
-            border-left: 1px solid var(--border-color);
-            transform-style: preserve-3d;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            overflow-y: auto;
-        }
-
-        .theme-controls h4 {
-            font-size: 1.125rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
-        .theme-controls label {
-            display: block;
-            margin-top: 0.75rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .theme-controls input {
-            width: 100%;
-            margin-bottom: 1rem;
-            accent-color: var(--primary);
-        }
-
-        /* Cards */
+        /* Enhanced Card Design */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 1rem;
-            height: calc((100vh - 4rem) / 2);
+            border-radius: clamp(12px, 2vw, 16px);
+            padding: var(--card-padding);
+            min-height: var(--card-min-height);
             backdrop-filter: blur(10px);
             transform-style: preserve-3d;
-            transition: all 0.6s var(--transition-bounce);
-            overflow: hidden;
+            transition: all 0.4s var(--transition-bounce);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
 
         .card:hover {
             transform: 
-                translateZ(20px)
+                translateZ(10px)
                 rotateX(var(--rotation-x))
                 rotateY(var(--rotation-y));
             box-shadow: 
-                0 5px 15px rgba(0,0,0,0.3),
-                0 0 30px rgba(var(--primary-rgb), 0.2);
+                0 5px 15px rgba(0,0,0,0.2),
+                0 0 30px rgba(var(--primary-rgb), 0.1);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.75rem;
-            flex-shrink: 0;
+            margin-bottom: clamp(10px, 2vh, 15px);
+            padding-bottom: var(--touch-target-spacing);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .card-title {
-            font-size: 1rem;
+            font-size: var(--font-size-lg);
             font-weight: 600;
-            background: linear-gradient(
-                45deg,
-                var(--primary),
-                var(--primary-light)
-            );
+            background: linear-gradient(45deg, var(--primary), var(--primary-light));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        /* Voice Command Button */
-        .voice-cmd {
+        /* Mobile-Optimized Controls */
+        .theme-controls {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: min(300px, 80vw);
+            background: var(--bg-card);
+            padding: var(--card-padding);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid var(--border-color);
+            transform: translateX(100%);
+            transition: transform 0.3s var(--transition-smooth);
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .theme-controls.active {
+            transform: translateX(0);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: var(--card-padding);
+            right: var(--card-padding);
+            width: var(--touch-target-size);
+            height: var(--touch-target-size);
             background: var(--primary);
             border: none;
+            border-radius: 50%;
+            color: white;
+            z-index: 1001;
             cursor: pointer;
             display: grid;
             place-items: center;
             transition: all 0.3s var(--transition-bounce);
         }
 
-        .voice-cmd:hover {
+        .menu-toggle:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 30px var(--primary);
         }
 
-        .voice-cmd.listening {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(var(--primary-rgb), 0); }
-            100% { transform: scale(1); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1400px) {
-            .main {
-                margin-right: 60px;
-                margin-left: 60px;
-                padding: 1rem;
-                gap: 0.75rem;
-            }
-
-            .card {
-                height: calc((100vh - 3rem) / 2);
-            }
-
-            .tool-btn {
-                padding: 0.625rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main {
-                margin: 0;
-                padding: 0.75rem;
-                gap: 0.75rem;
-                grid-template-columns: 1fr;
-            }
-
-            .card {
-                height: calc((100vh - 2rem) / 4);
-            }
-        }
-
-        /* Chart Styles */
+        /* Chart Containers */
         .chart-container {
             flex: 1;
             min-height: 0;
             position: relative;
+            width: 100%;
+            height: 100%;
         }
 
         canvas {
@@ -342,195 +207,145 @@
             height: 100% !important;
         }
 
-        /* Prediction Content */
-        #prediction-content {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0.5rem;
+        /* Mobile Touch Area */
+        .touch-area {
+            position: fixed;
+            bottom: var(--card-padding);
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(150px, 40vw, 200px);
+            height: clamp(150px, 40vw, 200px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: none;
+            z-index: 1000;
         }
 
-        .prediction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .prediction-item:last-child {
-            border-bottom: none;
-        }
-
-        .prediction-symbol {
-            font-weight: 600;
-        }
-
-        .prediction-value {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .prediction-value.up { color: var(--success); }
-        .prediction-value.down { color: var(--danger); }
-
-        /* Mobile Responsive Enhancements */
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-                height: auto;
-                min-height: 100vh;
-            }
-
-            .sidebar {
-                position: fixed;
-                left: -250px;
-                top: 0;
-                bottom: 0;
-                z-index: 1000;
-                transition: left 0.3s ease;
-            }
-
-            .sidebar.active {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-
-            .chart-container {
-                height: 250px;
-            }
-
-            .data-cards {
-                grid-template-columns: 1fr;
-            }
-
-            /* Mobile menu toggle */
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1001;
-                background: var(--primary);
-                color: white;
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-                cursor: pointer;
-                border: none;
-            }
-
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-            }
-
-            .overlay.active {
+        @media (hover: none) and (pointer: coarse) {
+            .touch-area {
                 display: block;
             }
         }
 
-        /* Small screens */
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                padding: 0.75rem;
-            }
-
-            .chart-container {
-                height: 200px;
-            }
-
-            .data-table {
-                font-size: 0.875rem;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 0.5rem;
-            }
+        /* Voice Command Button */
+        .voice-cmd {
+            position: fixed;
+            bottom: var(--card-padding);
+            right: var(--card-padding);
+            width: var(--touch-target-size);
+            height: var(--touch-target-size);
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.3s var(--transition-bounce);
+            z-index: 999;
         }
 
-        /* Landscape mode */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .sidebar {
-                padding-top: 0.5rem;
-            }
+        .voice-cmd:hover {
+            transform: scale(1.1);
+        }
 
-            .nav-item {
-                padding: 0.5rem 1rem;
-            }
+        .voice-cmd.listening {
+            animation: pulse 1.5s infinite;
+        }
 
-            .chart-container {
-                height: 180px;
-            }
+        /* Responsive Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Loading States */
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg-card);
+            backdrop-filter: blur(5px);
+            display: grid;
+            place-items: center;
+            font-size: var(--font-size-lg);
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(var(--primary-rgb), 0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Add mobile menu toggle -->
-    <button class="menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleThemeControls()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
     </button>
-    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- 3D Background Scene -->
     <div id="scene-container"></div>
 
     <div class="dashboard">
-        <main class="main">
-            <!-- Real-time Data Cards -->
-            <div class="card" id="market-overview">
-                <div class="card-header">
-                    <h3 class="card-title">Market Overview</h3>
-                </div>
+        <!-- Real-time Data Cards -->
+        <div class="card" id="market-overview">
+            <div class="card-header">
+                <h3 class="card-title">Market Overview</h3>
+            </div>
+            <div class="chart-container">
                 <canvas id="market-chart"></canvas>
-    </div>
+            </div>
+        </div>
 
-            <div class="card" id="sentiment-analysis">
-                <div class="card-header">
-                    <h3 class="card-title">Market Sentiment</h3>
-                </div>
+        <div class="card" id="sentiment-analysis">
+            <div class="card-header">
+                <h3 class="card-title">Market Sentiment</h3>
+            </div>
+            <div class="chart-container">
                 <canvas id="sentiment-chart"></canvas>
+            </div>
         </div>
 
-            <div class="card" id="volume-analysis">
-                <div class="card-header">
-                    <h3 class="card-title">Trading Volume</h3>
-                </div>
+        <div class="card" id="volume-analysis">
+            <div class="card-header">
+                <h3 class="card-title">Trading Volume</h3>
+            </div>
+            <div class="chart-container">
                 <canvas id="volume-chart"></canvas>
+            </div>
         </div>
 
-            <div class="card" id="predictions">
-                <div class="card-header">
-                    <h3 class="card-title">AI Predictions</h3>
-                </div>
-                <div id="prediction-content"></div>
+        <div class="card" id="predictions">
+            <div class="card-header">
+                <h3 class="card-title">AI Predictions</h3>
+            </div>
+            <div id="prediction-content"></div>
         </div>
-        </main>
     </div>
 
-    <!-- Theme Controls -->
+    <!-- Theme Controls Panel -->
     <div class="theme-controls">
         <h4>Theme Customization</h4>
         <label>Hue</label>
@@ -541,34 +356,15 @@
         <input type="range" id="lightness" min="0" max="100" value="65">
     </div>
 
-    <!-- Analysis Tools -->
-    <div class="analysis-tools">
-        <button class="tool-btn" onclick="toggleTrendlines()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M7 11l2-2 8 8M7 11l2-2 8 8M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Toggle Trendlines</span>
-        </button>
-        <button class="tool-btn" onclick="toggleVolume()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Toggle Volume</span>
-        </button>
-        <button class="tool-btn" onclick="togglePredictions()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Toggle Predictions</span>
-        </button>
-    </div>
-
     <!-- Voice Command Button -->
     <button class="voice-cmd" onclick="toggleVoiceCommand()">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
+
+    <!-- Touch Area for Mobile -->
+    <div class="touch-area"></div>
 
     <script>
         // Initialize 3D Scene
@@ -930,6 +726,71 @@
                 document.querySelector('.overlay').classList.remove('active');
             }
         });
+
+        // Add new mobile-friendly functions
+        function toggleThemeControls() {
+            document.querySelector('.theme-controls').classList.toggle('active');
+        }
+
+        // Enhanced touch handling
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!touchStartX || !touchStartY) return;
+
+            const touchEndX = e.touches[0].clientX;
+            const touchEndY = e.touches[0].clientY;
+
+            const deltaX = touchStartX - touchEndX;
+            const deltaY = touchStartY - touchEndY;
+
+            // Swipe right to open theme controls
+            if (deltaX < -50) {
+                document.querySelector('.theme-controls').classList.add('active');
+            }
+            // Swipe left to close theme controls
+            else if (deltaX > 50) {
+                document.querySelector('.theme-controls').classList.remove('active');
+            }
+
+            touchStartX = null;
+            touchStartY = null;
+        });
+
+        // Close theme controls when clicking outside
+        document.addEventListener('click', (e) => {
+            const themeControls = document.querySelector('.theme-controls');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!themeControls.contains(e.target) && !menuToggle.contains(e.target)) {
+                themeControls.classList.remove('active');
+            }
+        });
+
+        // Optimize chart responsiveness
+        function updateChartSizes() {
+            Object.values(charts).forEach(chart => {
+                if (chart.canvas) {
+                    const parent = chart.canvas.parentElement;
+                    chart.canvas.style.width = '100%';
+                    chart.canvas.style.height = parent.offsetHeight + 'px';
+                    chart.resize();
+                }
+            });
+        }
+
+        // Update chart sizes on resize and orientation change
+        window.addEventListener('resize', updateChartSizes);
+        window.addEventListener('orientationchange', updateChartSizes);
+
+        // Initial setup
+        updateChartSizes();
     </script>
 </body>
 </html>

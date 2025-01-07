@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Level 8: Advanced AR Experience</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/build/aframe-ar.js"></script>
@@ -15,6 +17,8 @@
             --danger: #ef4444;
             --bg-dark: rgba(15, 23, 42, 0.9);
             --text-light: #f8fafc;
+            --font-size-base: clamp(1rem, 2vw, 1.125rem);
+            --touch-target-size: 44px;
         }
 
         * {
@@ -24,6 +28,7 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            font-size: var(--font-size-base);
         }
 
         /* UI Overlay */
@@ -33,19 +38,18 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 0.75rem;
+            padding: max(0.75rem, var(--touch-target-size));
             background: var(--bg-dark);
             color: var(--text-light);
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 0.5rem;
             backdrop-filter: blur(10px);
         }
 
         @media (min-width: 768px) {
             .ui-overlay {
-                flex-direction: row;
-                justify-content: space-between;
+                grid-template-columns: 1fr auto;
                 align-items: center;
                 padding: 1rem;
             }
@@ -55,6 +59,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: var(--touch-target-size);
         }
 
         .status-dot {
@@ -84,9 +89,9 @@
             z-index: 1000;
             display: flex;
             justify-content: center;
-            gap: 0.75rem;
+            gap: clamp(0.75rem, 2vw, 1.5rem);
             background: var(--bg-dark);
-            padding: 0.75rem;
+            padding: max(0.75rem, calc(var(--touch-target-size) * 0.25));
             border-radius: 0.75rem;
             backdrop-filter: blur(10px);
             margin: 0 1rem;
@@ -98,8 +103,6 @@
                 right: auto;
                 transform: translateX(-50%);
                 bottom: 2rem;
-                gap: 1rem;
-                padding: 1rem;
             }
         }
 

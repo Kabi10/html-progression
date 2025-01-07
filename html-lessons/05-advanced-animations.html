@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Level 5: Advanced Animations</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     <style>
@@ -17,8 +20,12 @@
             
             --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
             --ease-smooth: cubic-bezier(0.45, 0, 0.55, 1);
-            --spacing-base: clamp(1rem, 2vw, 2rem);
+            --spacing-base: clamp(0.75rem, 2vw, 2rem);
             --touch-target: 44px;
+            --font-size-base: clamp(0.875rem, 1.5vw, 1.125rem);
+            --font-size-lg: clamp(1rem, 2vw, 1.5rem);
+            --font-size-xl: clamp(1.25rem, 3vw, 2rem);
+            --container-padding: clamp(1rem, 5vw, 3rem);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -33,10 +40,11 @@
             padding: 0;
             box-sizing: border-box;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg-light);
             color: var(--text-dark);
             min-height: 100vh;
@@ -45,6 +53,7 @@
             transition: background-color 0.5s var(--ease-smooth);
             overflow-x: hidden;
             padding: var(--spacing-base);
+            font-size: var(--font-size-base);
         }
 
         body.dark-mode {
@@ -54,19 +63,24 @@
 
         .container {
             width: 100%;
-            max-width: 1200px;
-            padding: var(--spacing-base);
+            max-width: min(1200px, 95vw);
+            padding: var(--container-padding);
+            display: grid;
+            gap: var(--spacing-base);
         }
 
         /* Hero Section with SVG Animation */
         .hero {
             position: relative;
             text-align: center;
-            padding: calc(var(--spacing-base) * 2) 0;
+            padding: clamp(1.5rem, 5vw, 4rem) 0;
+            display: grid;
+            place-items: center;
+            gap: var(--spacing-base);
         }
 
         .hero h1 {
-            font-size: clamp(2rem, 5vw, 4rem);
+            font-size: clamp(1.75rem, 5vw, 4rem);
             line-height: 1.2;
             margin-bottom: var(--spacing-base);
             opacity: 0;
@@ -75,13 +89,14 @@
         }
 
         .hero p {
-            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-size: var(--font-size-lg);
             opacity: 0.8;
-            max-width: min(600px, 90vw);
+            max-width: min(600px, 95vw);
             margin: 0 auto var(--spacing-base);
             opacity: 0;
             transform: translateY(20px);
             animation: slideUp 0.8s var(--ease-elastic) 0.2s forwards;
+            padding: 0 var(--spacing-base);
         }
 
         /* Animated Background */
@@ -93,11 +108,13 @@
             height: 100%;
             z-index: -1;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .animated-bg svg {
             width: 100%;
             height: 100%;
+            will-change: transform;
         }
 
         .wave {
@@ -119,23 +136,32 @@
         /* Interactive Cards Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+            margin-top: clamp(2rem, 4vw, 4rem);
+            width: 100%;
         }
 
         .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2rem;
+            border-radius: clamp(10px, 2vw, 20px);
+            padding: clamp(1.5rem, 3vw, 2rem);
             position: relative;
             overflow: hidden;
             transition: transform 0.5s var(--ease-elastic);
+            min-height: var(--touch-target);
+            touch-action: manipulation;
         }
 
-        .card:hover {
-            transform: translateY(-10px) scale(1.02);
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-10px) scale(1.02);
+            }
+        }
+
+        .card:active {
+            transform: scale(0.98);
         }
 
         .card::before {
@@ -147,14 +173,15 @@
             transition: opacity 0.3s var(--ease-smooth);
         }
 
-        .card:hover::before {
+        .card:hover::before,
+        .card:active::before {
             opacity: 0.1;
         }
 
         /* Animated Icons */
         .icon {
-            width: 60px;
-            height: 60px;
+            width: clamp(40px, 8vw, 60px);
+            height: clamp(40px, 8vw, 60px);
             margin-bottom: 1.5rem;
             position: relative;
         }
@@ -177,13 +204,109 @@
 
         /* Loading Animation */
         .loader {
-            width: 40px;
-            height: 40px;
+            width: clamp(30px, 6vw, 40px);
+            height: clamp(30px, 6vw, 40px);
             border: 3px solid var(--primary);
             border-radius: 50%;
             border-top-color: transparent;
             animation: spin 1s linear infinite;
-            margin: 2rem auto;
+            margin: clamp(1rem, 2vw, 2rem) auto;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: clamp(1rem, 2vw, 2rem);
+            right: clamp(1rem, 2vw, 2rem);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: currentColor;
+            transition: transform 0.3s var(--ease-elastic);
+            min-width: var(--touch-target);
+            min-height: var(--touch-target);
+            display: grid;
+            place-items: center;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle svg {
+            width: clamp(20px, 4vw, 24px);
+            height: clamp(20px, 4vw, 24px);
+            fill: currentColor;
+        }
+
+        /* Price Ticker */
+        .price-ticker {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: clamp(0.75rem, 1.5vw, 1rem);
+            transform: translateY(100%);
+            animation: slideUp 0.5s var(--ease-smooth) 1s forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        .ticker-content {
+            display: flex;
+            gap: clamp(1rem, 2vw, 2rem);
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: var(--touch-target);
+            padding: 0.25rem 0;
+        }
+
+        .price-change.up {
+            color: var(--secondary);
+        }
+
+        .price-change.down {
+            color: #ef4444;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-base);
+            }
+
+            .hero h1 {
+                padding: 0 var(--spacing-base);
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                margin: 0 var(--spacing-base);
+            }
+
+            .ticker-content {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .ticker-item {
+                justify-content: center;
+            }
         }
 
         /* Animations */
@@ -211,61 +334,15 @@
             }
         }
 
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-            color: currentColor;
-            transition: transform 0.3s var(--ease-elastic);
-        }
+        /* Touch Device Optimizations */
+        @media (hover: none) {
+            .card {
+                transform: none !important;
+            }
 
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .theme-toggle svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        /* Price Ticker */
-        .price-ticker {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 1rem;
-            transform: translateY(100%);
-            animation: slideUp 0.5s var(--ease-smooth) 1s forwards;
-        }
-
-        .ticker-content {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .ticker-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .price-change.up {
-            color: var(--secondary);
-        }
-
-        .price-change.down {
-            color: #ef4444;
+            .theme-toggle:active {
+                transform: scale(0.95);
+            }
         }
     </style>
 </head>
@@ -344,18 +421,19 @@
     </div>
 
     <script>
-        // Theme Toggle
+        // Theme Toggle with touch optimization
         const toggleDarkMode = () => {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         };
 
         // Load saved theme
-        if (localStorage.getItem('darkMode') === 'true') {
+        if (localStorage.getItem('darkMode') === 'true' || 
+            window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark-mode');
         }
 
-        // WebSocket Connection
+        // WebSocket Connection with reconnection logic
         const connectWebSocket = () => {
             const ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum');
             const btcPrice = document.getElementById('btcPrice');
@@ -365,48 +443,70 @@
 
             let lastBtcPrice = 0;
             let lastEthPrice = 0;
+            let reconnectAttempts = 0;
+            const maxReconnectAttempts = 5;
 
             ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                if (data.bitcoin) {
-                    const price = parseFloat(data.bitcoin);
-                    const change = lastBtcPrice ? ((price - lastBtcPrice) / lastBtcPrice) * 100 : 0;
-                    btcPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-                    btcChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    btcChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
-                    lastBtcPrice = price;
-                }
-                
-                if (data.ethereum) {
-                    const price = parseFloat(data.ethereum);
-                    const change = lastEthPrice ? ((price - lastEthPrice) / lastEthPrice) * 100 : 0;
-                    ethPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-                    ethChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    ethChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
-                    lastEthPrice = price;
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.bitcoin) {
+                        const price = parseFloat(data.bitcoin);
+                        const change = lastBtcPrice ? ((price - lastBtcPrice) / lastBtcPrice) * 100 : 0;
+                        btcPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                        btcChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                        btcChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
+                        lastBtcPrice = price;
+                    }
+                    
+                    if (data.ethereum) {
+                        const price = parseFloat(data.ethereum);
+                        const change = lastEthPrice ? ((price - lastEthPrice) / lastEthPrice) * 100 : 0;
+                        ethPrice.textContent = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                        ethChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                        ethChange.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
+                        lastEthPrice = price;
+                    }
+                } catch (error) {
+                    console.error('Error processing WebSocket message:', error);
                 }
             };
 
             ws.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                setTimeout(connectWebSocket, 5000);
+                console.log('WebSocket connection closed. Attempting to reconnect...');
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 5000 * reconnectAttempts);
+                } else {
+                    console.log('Max reconnection attempts reached');
+                    btcPrice.textContent = 'Offline';
+                    ethPrice.textContent = 'Offline';
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
             };
         };
 
         // Initialize WebSocket
         connectWebSocket();
 
-        // Add scroll-triggered animations
+        // Add scroll-triggered animations with Intersection Observer
         const observeElements = () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.style.opacity = '1';
                         entry.target.style.transform = 'translateY(0)';
+                        // Unobserve after animation
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { 
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
 
             document.querySelectorAll('.card').forEach(card => {
                 card.style.opacity = '0';
@@ -415,8 +515,17 @@
             });
         };
 
-        // Initialize animations
-        observeElements();
+        // Initialize animations with requestAnimationFrame for better performance
+        requestAnimationFrame(() => {
+            observeElements();
+        });
+
+        // Handle visibility change for WebSocket reconnection
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                connectWebSocket();
+            }
+        });
     </script>
 </body>
 </html>

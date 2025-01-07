@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1f2937">
     <meta name="description" content="Advanced CSS techniques and modern design">
     <title>Advanced CSS - Level 3</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
@@ -22,25 +23,32 @@
             --text-1: #1f2937;
             --text-2: #4b5563;
             
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 1rem;
-            --spacing-md: 1.5rem;
-            --spacing-lg: 2rem;
+            --spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
+            --spacing-sm: clamp(0.5rem, 2vw, 1rem);
+            --spacing-md: clamp(1rem, 3vw, 1.5rem);
+            --spacing-lg: clamp(1.5rem, 4vw, 2rem);
             
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
             
-            --border-radius-sm: 0.375rem;
-            --border-radius-md: 0.75rem;
-            --border-radius-lg: 1.5rem;
+            --border-radius-sm: clamp(0.25rem, 1vw, 0.375rem);
+            --border-radius-md: clamp(0.5rem, 2vw, 0.75rem);
+            --border-radius-lg: clamp(1rem, 3vw, 1.5rem);
             
             --transition-fast: 150ms ease;
             --transition-normal: 300ms ease;
             --transition-slow: 500ms ease;
             
-            --touch-target-size: 44px;
-            --touch-target-spacing: 8px;
+            --touch-target-size: max(44px, 3rem);
+            --touch-target-spacing: max(8px, 0.5rem);
+            
+            --font-size-base: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+            --font-size-lg: clamp(1rem, 1.5vw + 0.75rem, 1.25rem);
+            --font-size-xl: clamp(1.25rem, 2vw + 1rem, 1.5rem);
+            
+            --container-padding: clamp(1rem, 5vw, 3rem);
+            --container-max-width: min(90vw, 1200px);
         }
 
         /* Dark Mode Variables */
@@ -55,12 +63,13 @@
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.3);
         }
 
-        /* Modern CSS Reset with touch improvements */
+        /* Modern CSS Reset with enhanced touch improvements */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         /* Added touch-friendly scroll settings */
@@ -68,9 +77,11 @@
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
             -webkit-overflow-scrolling: touch;
+            font-size: var(--font-size-base);
+            overflow-x: hidden;
         }
 
-        /* Enhanced Base Styles for mobile */
+        /* Enhanced Base Styles for mobile-first approach */
         body {
             font-family: 'Poppins', system-ui, sans-serif;
             background-color: var(--surface-1);
@@ -78,34 +89,23 @@
             line-height: 1.6;
             transition: background-color var(--transition-normal), color var(--transition-normal);
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: var(--spacing-sm); /* Reduced padding for mobile */
-            font-size: 16px; /* Base font size for readability */
+            display: flex;
+            flex-direction: column;
+            padding: var(--container-padding);
+            font-size: var(--font-size-base);
+            overflow-x: hidden;
+            width: 100%;
         }
 
-        /* Responsive Grid Layout */
+        /* Mobile-first Grid Layout */
         .container {
             display: grid;
-            grid-template-columns: 1fr; /* Single column by default */
-            gap: var(--spacing-sm);
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: var(--spacing-md);
             width: 100%;
+            max-width: var(--container-max-width);
+            margin: 0 auto;
             padding: var(--spacing-sm);
-            max-width: 100%;
-        }
-
-        /* Media query for larger screens */
-        @media (min-width: 768px) {
-            .container {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: var(--spacing-md);
-                padding: var(--spacing-md);
-                max-width: 1200px;
-            }
-            
-            body {
-                padding: var(--spacing-md);
-            }
         }
 
         /* Enhanced Card Component with touch-friendly styles */
@@ -119,6 +119,8 @@
             overflow: hidden;
             min-height: var(--touch-target-size);
             touch-action: manipulation;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .card::before {
@@ -134,13 +136,27 @@
             transition: transform var(--transition-normal);
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .card:hover::before {
+                transform: scaleX(1);
+            }
         }
 
-        .card:hover::before {
-            transform: scaleX(1);
+        /* Touch device specific styles */
+        @media (hover: none) {
+            .card:active {
+                transform: scale(0.98);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .card:active::before {
+                transform: scaleX(1);
+            }
         }
 
         /* Advanced Typography */
@@ -152,11 +168,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-align: center;
         }
 
-        h1 { font-size: clamp(2rem, 5vw, 3rem); }
-        h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
-        h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
+        h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); }
+        h2 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+        h3 { font-size: clamp(1rem, 2vw, 1.25rem); }
 
         /* Advanced Button Styles */
         .btn {
@@ -170,6 +187,12 @@
             transition: all var(--transition-normal);
             position: relative;
             overflow: hidden;
+            min-width: var(--touch-target-size);
+            min-height: var(--touch-target-size);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn::before {
@@ -185,8 +208,16 @@
             border-radius: 50%;
         }
 
-        .btn:hover::before {
-            transform: translate(-50%, -50%) scale(1);
+        @media (hover: hover) {
+            .btn:hover::before {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @media (hover: none) {
+            .btn:active::before {
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
 
         .btn span {
@@ -203,6 +234,8 @@
             background: var(--surface-1);
             color: var(--text-1);
             transition: all var(--transition-normal);
+            min-height: var(--touch-target-size);
+            font-size: var(--font-size-base);
         }
 
         .input:focus {
@@ -211,51 +244,16 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
 
-        /* Advanced Animation */
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
-        }
-
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            padding: var(--spacing-sm);
-            border-radius: 50%;
-            background: var(--surface-2);
-            border: none;
-            cursor: pointer;
-            box-shadow: var(--shadow-md);
-            transition: all var(--transition-normal);
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Quote Card Styles */
         .quote-card {
             text-align: center;
             position: relative;
+            padding: var(--spacing-lg);
         }
 
         .quote-text {
             font-style: italic;
-            font-size: 1.1rem;
+            font-size: var(--font-size-lg);
             color: var(--text-2);
             margin: var(--spacing-md) 0;
             min-height: 80px;
@@ -267,7 +265,7 @@
         .quote-text::before,
         .quote-text::after {
             content: '"';
-            font-size: 2rem;
+            font-size: calc(var(--font-size-xl) * 1.5);
             color: var(--primary-color);
             opacity: 0.5;
         }
@@ -297,11 +295,25 @@
             padding: var(--spacing-xs);
             border-radius: 50%;
             transition: all var(--transition-normal);
+            min-width: var(--touch-target-size);
+            min-height: var(--touch-target-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .refresh-quote:hover {
-            color: var(--primary-color);
-            transform: rotate(180deg);
+        @media (hover: hover) {
+            .refresh-quote:hover {
+                color: var(--primary-color);
+                transform: rotate(180deg);
+            }
+        }
+
+        @media (hover: none) {
+            .refresh-quote:active {
+                color: var(--primary-color);
+                transform: rotate(180deg) scale(0.95);
+            }
         }
 
         @keyframes pulse {
@@ -312,6 +324,69 @@
 
         .loading {
             animation: pulse 1s infinite;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            padding: var(--spacing-sm);
+            border-radius: 50%;
+            background: var(--surface-2);
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            min-width: var(--touch-target-size);
+            min-height: var(--touch-target-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-size: var(--font-size-lg);
+        }
+
+        @media (hover: hover) {
+            .theme-toggle:hover {
+                transform: scale(1.1);
+            }
+        }
+
+        @media (hover: none) {
+            .theme-toggle:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-xs);
+            }
+
+            .card {
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .theme-toggle {
+                top: var(--spacing-sm);
+                right: var(--spacing-sm);
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container {
+                padding-top: calc(var(--touch-target-size) + var(--spacing-md));
+            }
         }
     </style>
 </head>
@@ -345,7 +420,7 @@
         </div>
 
         <!-- Feature Card 3: Form Styling -->
-    <div class="card">
+        <div class="card">
             <h2>Modern Forms</h2>
             <input type="text" class="input" placeholder="Type something..." style="margin: var(--spacing-md) 0;">
             <p>Advanced form styling with focus states and transitions.</p>
@@ -353,19 +428,25 @@
     </div>
 
     <script>
-        // Theme Toggle
+        // Theme Toggle with persistence
         function toggleTheme() {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+            const newTheme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+            document.body.dataset.theme = newTheme;
+            localStorage.setItem('theme', newTheme);
         }
 
-        // Dynamic Color Change
+        // Initialize theme from localStorage
+        document.body.dataset.theme = localStorage.getItem('theme') || 'light';
+
+        // Dynamic Color Change with smooth transition
         function changeHue() {
             const root = document.documentElement;
-            const newHue = Math.floor(Math.random() * 360);
+            const currentHue = getComputedStyle(root).getPropertyValue('--primary-hue').trim();
+            const newHue = (parseInt(currentHue) + 40) % 360;
             root.style.setProperty('--primary-hue', newHue);
         }
 
-        // Quote functionality
+        // Enhanced Quote functionality with better error handling and loading states
         const fallbackQuotes = [
             {
                 text: "The journey of a thousand miles begins with one step.",
@@ -393,13 +474,21 @@
             const quoteElement = document.getElementById('quote');
             const authorElement = document.getElementById('author');
             
-            // Add loading state
+            // Add loading state with smooth transition
             quoteElement.classList.add('loading');
             authorElement.classList.remove('show');
             quoteElement.textContent = 'Fetching inspiration...';
             
             try {
-                const response = await fetch('https://api.quotable.io/random');
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                
+                const response = await fetch('https://api.quotable.io/random', {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
                 if (!response.ok) throw new Error('Failed to fetch');
                 const data = await response.json();
                 
@@ -411,16 +500,16 @@
                 }, 500);
                 
             } catch (error) {
-                // Use fallback quote
+                console.error('Error fetching quote:', error);
+                // Use fallback quote with smooth transition
                 const fallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
                 setTimeout(() => {
                     quoteElement.textContent = fallback.text;
                     authorElement.textContent = `— ${fallback.author}`;
                     authorElement.classList.add('show');
                 }, 500);
-                console.error('Error fetching quote:', error);
             } finally {
-                // Remove loading state
+                // Remove loading state with smooth transition
                 setTimeout(() => {
                     quoteElement.classList.remove('loading');
                 }, 500);
@@ -428,8 +517,18 @@
         }
 
         // Initialize
-        document.body.dataset.theme = 'light';
         fetchQuote(); // Fetch initial quote
+
+        // Add touch feedback for cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            }, { passive: true });
+
+            card.addEventListener('touchend', () => {
+                card.style.transform = '';
+            }, { passive: true });
+        });
     </script>
 </body>
 </html>

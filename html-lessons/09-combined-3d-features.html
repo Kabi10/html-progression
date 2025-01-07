@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Level 9: Advanced 3D Interactive Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,6 +18,8 @@
             --danger: #ef4444;
             --bg-dark: #0f172a;
             --text-light: #f8fafc;
+            --base-font-size: clamp(16px, 2vw, 18px);
+            --heading-font-size: clamp(20px, 3vw, 24px);
         }
 
         * {
@@ -29,6 +35,7 @@
             background: var(--bg-dark);
             color: var(--text-light);
             -webkit-tap-highlight-color: transparent;
+            font-size: var(--base-font-size);
         }
 
         #scene-container {
@@ -41,36 +48,36 @@
 
         .overlay {
             position: fixed;
-            padding: 15px;
+            padding: clamp(10px, 2vw, 15px);
             background: rgba(15, 23, 42, 0.9);
             border-radius: 10px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
             max-width: 100%;
-            margin: 10px;
+            margin: clamp(5px, 1vw, 10px);
         }
 
         #controls {
             top: 20px;
             left: 20px;
-            width: calc(100% - 40px);
-            max-width: 300px;
+            width: calc(100% - clamp(20px, 4vw, 40px));
+            max-width: min(300px, 90vw);
         }
 
         #stats {
             top: 20px;
             right: 20px;
-            width: calc(100% - 40px);
-            max-width: 200px;
+            width: calc(100% - clamp(20px, 4vw, 40px));
+            max-width: min(200px, 90vw);
         }
 
         #charts {
             bottom: 20px;
             right: 20px;
-            width: calc(100% - 40px);
-            max-width: 300px;
-            height: 200px;
+            width: calc(100% - clamp(20px, 4vw, 40px));
+            max-width: min(300px, 90vw);
+            height: clamp(150px, 30vh, 200px);
         }
 
         .shape-controls {
@@ -85,19 +92,19 @@
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
-            width: 90%;
+            width: min(90%, 600px);
         }
 
         .button-group {
             margin-top: 15px;
             display: flex;
-            gap: 10px;
+            gap: clamp(5px, 1vw, 10px);
             flex-wrap: wrap;
             justify-content: center;
         }
 
         button {
-            padding: 12px 20px;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
             background: var(--primary);
             color: white;
             border: none;
@@ -588,6 +595,93 @@
         }
 
         animate();
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isTouching = false;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isTouching = true;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isTouching) return;
+
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            const deltaX = touchX - touchStartX;
+            const deltaY = touchY - touchStartY;
+
+            camera.position.x += deltaX * 0.005;
+            camera.position.y -= deltaY * 0.005;
+            camera.lookAt(scene.position);
+
+            touchStartX = touchX;
+            touchStartY = touchY;
+        });
+
+        document.addEventListener('touchend', () => {
+            isTouching = false;
+        });
+
+        // Double tap to select object
+        let lastTap = 0;
+        document.addEventListener('touchend', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                const touch = e.changedTouches[0];
+                const raycaster = new THREE.Raycaster();
+                const mouse = new THREE.Vector2();
+                
+                mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(objects);
+                
+                if (intersects.length > 0) {
+                    selectedObject = intersects[0].object;
+                    selectedObject.material.emissive.setHex(0x666666);
+                    objects.forEach(obj => {
+                        if (obj !== selectedObject) {
+                            obj.material.emissive.setHex(0x000000);
+                        }
+                    });
+                }
+            }
+            lastTap = currentTime;
+        });
+
+        // Pinch to zoom
+        let initialPinchDistance = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const currentPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                
+                const pinchDelta = currentPinchDistance - initialPinchDistance;
+                camera.position.z -= pinchDelta * 0.01;
+                
+                initialPinchDistance = currentPinchDistance;
+            }
+        });
     </script>
 </body>
 </html> 
